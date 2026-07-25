@@ -4,28 +4,83 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Luyện Từ Vựng HSK</title>
+    <!-- Thư viện SheetJS đọc file Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* ============================================================ */
-        /* CSS CHUNG (MÁY TÍNH)                                         */
-        /* ============================================================ */
-        body { font-family: Arial, sans-serif; margin: 15px; background-color: #f4f4f9; font-size: 14px; }
+        /* ================= CSS GIAO DIỆN CHUNG (MÁY TÍNH) ================= */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 15px; 
+            background-color: #f4f4f9; 
+            font-size: 14px; 
+        }
         
-        .controls { margin-bottom: 15px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; background: #fff; padding: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .controls label, .controls button, .controls select, .controls input[type="number"] { font-size: 13px; }
+        .controls { 
+            margin-bottom: 15px; 
+            display: flex; 
+            gap: 8px; 
+            flex-wrap: wrap; 
+            align-items: center; 
+            background: #fff; 
+            padding: 12px; 
+            border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+        }
+
+        .controls label, .controls button, .controls select, .controls input[type="number"] { 
+            font-size: 13px; 
+        }
         
-        .btn { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; color: white; font-size: 13px; white-space: nowrap; }
+        .btn { 
+            padding: 6px 12px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            color: white; 
+            font-size: 13px; 
+            white-space: nowrap; 
+            display: inline-block;
+        }
+
         .btn-green { background-color: #28a745; }
         .btn-purple { background-color: #6f42c1; }
         .btn-orange { background-color: #fd7e14; }
         .btn-red { background-color: #dc3545; }
         
-        .container { display: flex; gap: 15px; flex-wrap: wrap; }
-        .table-container { flex: 1; min-width: 300px; background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); overflow-x: auto; }
+        .container { 
+            display: flex; 
+            gap: 15px; 
+            flex-wrap: wrap; 
+        }
+
+        .table-container { 
+            flex: 1; 
+            min-width: 300px; 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 12px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            overflow-x: auto; 
+        }
         
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #ddd; padding: 8px 4px; text-align: center; word-wrap: break-word; }
-        th { background-color: #f8f9fa; font-size: 13px; }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            table-layout: fixed; 
+        }
+
+        th, td { 
+            border: 1px solid #ddd; 
+            padding: 8px 4px; 
+            text-align: center; 
+            word-wrap: break-word; 
+        }
+
+        th { 
+            background-color: #f8f9fa; 
+            font-size: 13px; 
+        }
         
         /* Chia tỉ lệ cột trên máy tính */
         .col-stt { width: 6%; }
@@ -36,20 +91,39 @@
         .col-input { width: 15%; }
         .col-status { width: 8%; }
 
-        input[type="text"] { width: 90%; padding: 6px 2px; border: 1px solid #ccc; border-radius: 4px; text-align: center; font-size: 13px; }
+        input[type="text"] { 
+            width: 90%; 
+            padding: 6px 2px; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+            text-align: center; 
+            font-size: 13px; 
+        }
         
         .correct { color: #28a745; font-weight: bold; }
         .wrong { color: #dc3545; font-weight: bold; }
         
-        .stats-card { width: 200px; background: #fff; border-radius: 8px; padding: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: fit-content; }
+        .stats-card { 
+            width: 200px; 
+            background: #fff; 
+            border-radius: 8px; 
+            padding: 12px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+            height: fit-content; 
+        }
+
         .stats-card h3 { font-size: 15px; margin-top: 0; margin-bottom: 10px; }
         .stats-card p { margin: 6px 0; font-size: 13px; }
         
-        .loading-msg { font-style: italic; color: #007bff; font-weight: bold; margin-left: 5px; font-size: 12px; }
+        .loading-msg { 
+            font-style: italic; 
+            color: #28a745; 
+            font-weight: bold; 
+            margin-left: 5px; 
+            font-size: 12px; 
+        }
 
-        /* ============================================================ */
-        /* CSS CHO ĐIỆN THOẠI (Ép gọn lại để không bị khuất ô nhập)     */
-        /* ============================================================ */
+        /* ================= CSS CHO ĐIỆN THOẠI (GỌN MÀN HÌNH) ================= */
         @media (max-width: 600px) {
             body { margin: 5px; font-size: 12px; }
             
@@ -63,10 +137,10 @@
             th, td { padding: 5px 2px; font-size: 11px; }
             th { font-size: 10px; }
             
-            /* Ẩn cột STT, Loại từ, Đúng/Sai trên điện thoại để đỡ chật */
+            /* Ẩn cột STT, Loại từ, Đúng/Sai trên điện thoại để không bị chật */
             .col-stt, .col-type, .col-status { display: none; }
             
-            /* Chia lại tỉ lệ 4 cột còn lại vừa khít màn hình điện thoại */
+            /* Tỉ lệ 4 cột chính còn lại trên điện thoại */
             .col-hanzi { width: 26%; font-size: 14px; }
             .col-pinyin { width: 22%; }
             .col-viet { width: 28%; }
@@ -132,79 +206,101 @@
     </div>
 
     <script>
-        const DEFAULT_EXCEL_FILE = 'Tu_Vung_Custom.xlsx';
+        // Dữ liệu từ vựng dự phòng (mặc định)
+        const EMBEDDED_VOCAB_DATA = [
+            {"chinese": "你", "type": "Đại từ", "pinyin": "nǐ", "meaning": "Bạn, anh, chị, cậu"},
+            {"chinese": "好", "type": "Tính từ", "pinyin": "hǎo", "meaning": "Tốt, khỏe, ngon, đẹp"},
+            {"chinese": "你好", "type": "Cụm từ", "pinyin": "nǐ hǎo", "meaning": "Xin chào"},
+            {"chinese": "一", "type": "Số từ", "pinyin": "yī", "meaning": "Một"},
+            {"chinese": "五", "type": "Số từ", "pinyin": "wǔ", "meaning": "Năm (số 5)"}
+        ];
+
         let fullVocabData = [];
         let currentQuizData = [];
 
+        // Khởi tạo ứng dụng
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
             if (savedData) {
-                fullVocabData = JSON.parse(savedData);
-                startNewQuiz();
+                try {
+                    fullVocabData = JSON.parse(savedData);
+                } catch(e) {
+                    fullVocabData = [...EMBEDDED_VOCAB_DATA];
+                }
             } else {
-                loadDefaultExcel();
+                fullVocabData = [...EMBEDDED_VOCAB_DATA];
             }
+            startNewQuiz();
         };
 
-        function loadDefaultExcel() {
-            const statusText = document.getElementById('loadingStatus');
-            statusText.innerText = "⏳ Đang tải file...";
-            
-            fetch(DEFAULT_EXCEL_FILE)
-                .then(response => {
-                    if (!response.ok) throw new Error("Không tìm thấy file");
-                    return response.arrayBuffer();
-                })
-                .then(buffer => {
-                    parseExcelAndInit(buffer);
-                    statusText.innerText = "";
-                })
-                .catch(err => {
-                    console.log("Không tải được file mặc định:", err);
-                    statusText.innerText = "(Hãy chọn file Excel)";
-                });
-        }
-
+        // HÀM XỬ LÝ ĐỌC FILE EXCEL CỦA NGƯỜI DÙNG (TƯƠNG THÍCH HOÀN TOÀN MOBILE)
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
+
+            const statusText = document.getElementById('loadingStatus');
+            if (statusText) statusText.innerText = "⏳ Đang nạp...";
+
             const reader = new FileReader();
+
+            // Đọc dạng BinaryString giúp chạy mượt trên mọi điện thoại (iOS Safari / Android Chrome)
             reader.onload = function(e) {
-                parseExcelAndInit(e.target.result);
-                localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
+                try {
+                    const data = e.target.result;
+                    const workbook = XLSX.read(data, { type: 'binary' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet);
+
+                    if (!json || json.length === 0) {
+                        alert("File Excel trống hoặc không đọc được dữ liệu!");
+                        if (statusText) statusText.innerText = "";
+                        return;
+                    }
+
+                    // Tự động nhận diện nhiều dạng tên cột tiếng Việt / tiếng Anh khác nhau
+                    fullVocabData = json.map(row => ({
+                        chinese: row['CHENESE'] || row['Tiếng Trung'] || row['Chữ Hán'] || row['Word'] || row['Chinese'] || row['CHỮ HÁN'] || '',
+                        type: row['VOCABULARY'] || row['Loại từ'] || row['Type'] || row['LOẠI TỪ'] || '',
+                        pinyin: row['PINYIN'] || row['Pinyin'] || row['Phát âm'] || row['Phien am'] || '',
+                        meaning: row['MEANING'] || row['Tiếng Việt'] || row['Nghĩa'] || row['Meaning'] || row['NGHĨA TIẾNG VIỆT'] || ''
+                    })).filter(item => item.chinese || item.meaning);
+
+                    // Lưu vào bộ nhớ trình duyệt điện thoại
+                    localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
+
+                    if (statusText) statusText.innerText = "✅ Đã nạp xong!";
+                    
+                    startNewQuiz();
+                    alert("Thành công! Đã nạp " + fullVocabData.length + " từ vựng từ file của bạn.");
+
+                } catch (err) {
+                    alert("Lỗi đọc file: " + err.message);
+                    if (statusText) statusText.innerText = "❌ Lỗi file";
+                }
             };
-            reader.readAsArrayBuffer(file);
+
+            reader.readAsBinaryString(file);
         });
 
-        function parseExcelAndInit(buffer) {
-            const workbook = XLSX.read(buffer, { type: 'array' });
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const json = XLSX.utils.sheet_to_json(worksheet);
-
-            fullVocabData = json.map(row => ({
-                chinese: row['Tiếng Trung'] || row['Chữ Hán'] || row['Word'] || row['Chinese'] || '',
-                type: row['Loại từ'] || row['Type'] || '',
-                pinyin: row['Pinyin'] || row['Phát âm'] || '',
-                meaning: row['Tiếng Việt'] || row['Nghĩa'] || row['Meaning'] || row['Vietnamese'] || ''
-            })).filter(item => item.chinese || item.meaning);
-
-            startNewQuiz();
-        }
-
+        // Đổi bộ câu hỏi ngẫu nhiên mới
         function startNewQuiz() {
-            if (fullVocabData.length === 0) return;
+            if (!fullVocabData || fullVocabData.length === 0) {
+                fullVocabData = [...EMBEDDED_VOCAB_DATA];
+            }
             const size = parseInt(document.getElementById('quizSize').value) || 10;
             const shuffled = [...fullVocabData].sort(() => 0.5 - Math.random());
             currentQuizData = shuffled.slice(0, Math.min(size, fullVocabData.length));
             renderTable();
         }
 
+        // Làm lại bộ câu hỏi hiện tại
         function retryCurrentQuiz() {
             if (currentQuizData.length === 0) return;
             renderTable();
         }
 
+        // Hiển thị dữ liệu ra bảng
         function renderTable() {
             const tbody = document.getElementById('vocabTable');
             const mode = document.getElementById('modeSelect').value;
@@ -233,6 +329,7 @@
             updateStats();
         }
 
+        // Kiểm tra đáp án khi gõ vào ô nhập
         function checkAnswer(index) {
             const inputVal = document.getElementById(`input_${index}`).value.trim().toLowerCase();
             const mode = document.getElementById('modeSelect').value;
@@ -248,13 +345,13 @@
 
             let isCorrect = false;
             if (mode === 'pinyin_to_chinese') {
-                const targetPinyin = item.pinyin.toLowerCase();
-                const targetChinese = item.chinese.toLowerCase();
+                const targetPinyin = (item.pinyin || '').toLowerCase();
+                const targetChinese = (item.chinese || '').toLowerCase();
                 if (inputVal === targetPinyin || inputVal === targetChinese) {
                     isCorrect = true;
                 }
             } else {
-                const targetMeaning = item.meaning.toLowerCase();
+                const targetMeaning = (item.meaning || '').toLowerCase();
                 if (targetMeaning.includes(inputVal) && inputVal.length >= 1) {
                     isCorrect = true;
                 }
@@ -274,6 +371,7 @@
             updateStats();
         }
 
+        // Cập nhật thẻ thống kê kết quả
         function updateStats() {
             const total = currentQuizData.length;
             let done = 0, correct = 0, wrong = 0;
@@ -300,12 +398,17 @@
             document.getElementById('statRate').innerText = `${rate}%`;
         }
 
+        // Gắn sự kiện cho các nút điều khiển
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
         document.getElementById('modeSelect').addEventListener('change', renderTable);
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
-            location.reload();
+            fullVocabData = [...EMBEDDED_VOCAB_DATA];
+            const statusText = document.getElementById('loadingStatus');
+            if (statusText) statusText.innerText = "";
+            startNewQuiz();
+            alert("Đã xóa dữ liệu tạm và khôi phục về mặc định!");
         });
     </script>
 </body>
