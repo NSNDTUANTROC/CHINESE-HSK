@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luyện Từ Vựng HSK Pro</title>
-    <!-- Nhập phông Noto Serif SC (chữ Khải/Thư pháp rõ nét) & Noto Sans SC -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+    <title>Luyện Từ Vựng HSK Pro - TRẦN ANH TUẤN</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -32,24 +31,59 @@
             box-sizing: border-box;
         }
 
-        /* HEADER & CONTAINER */
+        /* HEADER & BANNER SỞ HỮU */
         .app-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .app-title {
             font-size: 22px;
-            font-weight: 600;
+            font-weight: 700;
             color: var(--text-dark);
             display: flex;
             align-items: center;
             gap: 8px;
             margin: 0;
+        }
+
+        /* NHÃN THÔNG TIN SỞ HỮU TRANG WEB */
+        .owner-badge {
+            background: linear-gradient(135deg, #e0e7ff, #f1f5f9);
+            border: 1px solid #c7d2fe;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .owner-badge .owner-icon {
+            font-size: 14px;
+        }
+
+        .owner-badge .owner-info {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+
+        .owner-badge .owner-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #3730a3;
+            letter-spacing: 0.5px;
+        }
+
+        .owner-badge .owner-class {
+            font-size: 11px;
+            color: #4338ca;
+            font-weight: 500;
         }
 
         .controls { 
@@ -129,11 +163,11 @@
             table-layout: fixed; 
         }
 
-        /* THANH TIÊU ĐỀ TH: MẮT NHÌN DỄ CHỊU, CHỮ KHÔNG TÔ ĐẬM LỆCH */
+        /* THANH TIÊU ĐỀ BẢNG */
         th { 
             background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
             color: #ffffff !important;
-            font-weight: 500 !important; /* Độ dày vừa phải, không bị thô */
+            font-weight: 500 !important;
             font-size: 13px !important;
             font-style: normal !important;
             text-transform: uppercase;
@@ -142,7 +176,6 @@
             border: none !important;
         }
 
-        /* Bo góc thanh tiêu đề */
         th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
         th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
@@ -158,7 +191,7 @@
         td.col-hanzi { 
             font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
             font-size: 21px; 
-            font-weight: 400 !important; /* KHÔNG TÔ ĐẬM giúp các nét tách biệt rõ ràng */
+            font-weight: 400 !important;
             color: #1e293b;
             letter-spacing: 1px;
         }
@@ -260,6 +293,13 @@
         .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
         .stat-card .value { font-size: 16px; font-weight: 600; }
 
+        .footer-owner {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
         @media (max-width: 768px) {
             body { padding: 10px; }
             .main-layout { flex-direction: column; }
@@ -276,7 +316,14 @@
 
     <div class="app-header">
         <h2 class="app-title">⚡ Luyện Từ Vựng HSK</h2>
-        <span id="loadingStatus" style="font-size: 13px; font-weight: 600; color: var(--success);"></span>
+
+        <div class="owner-badge">
+            <span class="owner-icon">👤</span>
+            <div class="owner-info">
+                <span class="owner-name">TRẦN ANH TUẤN</span>
+                <span class="owner-class">C7 CB K139-140</span>
+            </div>
+        </div>
     </div>
 
     <div class="controls">
@@ -299,6 +346,7 @@
         <button class="btn btn-purple" id="btnNewQuiz">🔀 Đổi đề</button>
         <button class="btn btn-orange" id="btnRetryQuiz">🔄 Làm lại</button>
         <button class="btn btn-red" id="btnReset">🗑 Xóa data</button>
+        <span id="loadingStatus" style="font-size: 13px; font-weight: 600; color: var(--success); margin-left: auto;"></span>
     </div>
 
     <div class="main-layout">
@@ -347,6 +395,10 @@
             <div style="margin-top: 15px; text-align: center; background: #f8fafc; padding: 10px; border-radius: 10px;">
                 <div style="font-size: 12px; color: var(--text-muted);">Tỷ lệ chính xác</div>
                 <div style="font-size: 20px; font-weight: 700; color: var(--primary);" id="statRate">0.0%</div>
+            </div>
+
+            <div class="footer-owner">
+                Bản quyền thuộc sở hữu:<br><b>TRẦN ANH TUẤN - C7 CB K139-140</b>
             </div>
         </div>
     </div>
@@ -535,31 +587,3 @@
                         done++; correct++;
                     } else if (statusTd.innerText.includes('Sai')) {
                         done++; wrong++;
-                    }
-                }
-            });
-
-            document.getElementById('statTotal').innerText = total;
-            document.getElementById('statDone').innerText = done;
-            document.getElementById('statCorrect').innerText = correct;
-            document.getElementById('statWrong').innerText = wrong;
-            
-            const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
-            document.getElementById('statRate').innerText = `${rate}%`;
-
-            const progressPercent = total > 0 ? (done / total) * 100 : 0;
-            document.getElementById('progressBar').style.width = `${progressPercent}%`;
-        }
-
-        document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
-        document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
-        document.getElementById('modeSelect').addEventListener('change', renderTable);
-        document.getElementById('btnReset').addEventListener('click', function() {
-            localStorage.removeItem('hsk_vocab_data');
-            fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            startNewQuiz();
-            alert("Đã khôi phục dữ liệu về mặc định!");
-        });
-    </script>
-</body>
-</html>
