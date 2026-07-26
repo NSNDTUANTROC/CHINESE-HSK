@@ -2,7 +2,6 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <!-- Thêm user-scalable=no và maximum-scale=1.0 để chặn điện thoại tự động zoom -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK</title>
     <!-- Thư viện SheetJS đọc file Excel -->
@@ -76,6 +75,7 @@
             padding: 8px 4px; 
             text-align: center; 
             word-wrap: break-word; 
+            transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu mượt */
         }
 
         th { 
@@ -101,8 +101,16 @@
             font-size: 14px; 
         }
         
-        .correct { color: #28a745; font-weight: bold; }
-        .wrong { color: #dc3545; font-weight: bold; }
+        /* === MÀU NỀN TÔ DÒNG KHI ĐÚNG/SAI === */
+        tr.row-correct { 
+            background-color: #d4edda !important; /* Xanh lá nhạt */
+        }
+        tr.row-wrong { 
+            background-color: #f8d7da !important; /* Đỏ nhạt */
+        }
+
+        .correct { color: #155724; font-weight: bold; }
+        .wrong { color: #721c24; font-weight: bold; }
         
         .stats-card { 
             width: 200px; 
@@ -124,7 +132,6 @@
             font-size: 12px; 
         }
 
-        /* Tối ưu riêng cho màn hình điện thoại nhỏ */
         @media (max-width: 600px) {
             body { margin: 5px; font-size: 12px; }
             .controls { padding: 8px; gap: 6px; justify-content: center; }
@@ -137,7 +144,6 @@
             .col-pinyin { width: 22%; }
             .col-viet { width: 28%; }
             .col-input { width: 24%; }
-            /* Cỡ chữ ô input 16px để triệt tiêu hoàn toàn tính năng auto-zoom của điện thoại */
             input[type="text"] { font-size: 16px; padding: 4px 0; width: 95%; }
             .stats-card { width: auto; margin-top: 5px; }
         }
@@ -287,10 +293,12 @@
 
             currentQuizData.forEach((item, index) => {
                 const tr = document.createElement('tr');
+                tr.id = `row_${index}`; // Đặt ID cho từng hàng
+                
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
                 const chineseDisplay = isPinyinMode ? '***' : item.chinese;
-                const pinyinDisplay = '***'; // Ẩn Pinyin ở cả 2 chế độ
+                const pinyinDisplay = '***';
                 const meaningDisplay = !isPinyinMode ? '***' : item.meaning;
 
                 tr.innerHTML = `
@@ -313,7 +321,6 @@
             updateStats();
         }
 
-        // Tự động nhảy ô khi gõ xong chữ Hán trên di động
         function handleCompositionEnd(index) {
             setTimeout(() => {
                 moveToNext(index);
@@ -346,10 +353,12 @@
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
             const statusTd = document.getElementById(`status_${index}`);
+            const rowTr = document.getElementById(`row_${index}`);
 
             if (inputVal === '') {
                 statusTd.innerText = '-';
                 statusTd.className = 'col-status';
+                rowTr.className = ''; // Bỏ tô màu nếu xóa ô nhập
                 updateStats();
                 return;
             }
@@ -368,15 +377,18 @@
                 }
             }
 
+            // Đổi màu nền của toàn bộ hàng theo kết quả
             if (isCorrect) {
                 statusTd.innerText = '✓ Đúng';
                 statusTd.className = 'col-status correct';
+                rowTr.className = 'row-correct'; // Tô màu xanh nhạt
             } else {
                 statusTd.innerText = '✗ Sai';
                 statusTd.className = 'col-status wrong';
+                rowTr.className = 'row-wrong'; // Tô màu đỏ nhạt
             }
 
-            // Hiện thông tin chi tiết
+            // Hiện đáp án bị ẩn
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
