@@ -23,9 +23,12 @@
             --card-bg: rgba(255, 255, 255, 0.93);
             --text-dark: #0f172a;
             --text-muted: #64748b;
-            --header-bg-start: #e6f7ed;
-            --header-bg-end: #cbf3dc;
-            --header-text: #065f46;
+            
+            /* TÔNG MÀU MỚI CHO TIÊU ĐỀ: XANH DƯƠNG / INDIGO (Không trùng với Xanh Lá của Đáp án) */
+            --header-bg-start: #eef2ff;
+            --header-bg-end: #e0e7ff;
+            --header-text: #3730a3;
+            --header-border: #c7d2fe;
         }
 
         body { 
@@ -34,7 +37,7 @@
             padding: 20px;
             background-color: var(--bg-body); 
             background-image: 
-                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
                 radial-gradient(at 100% 0%, rgba(251, 207, 232, 0.2) 0px, transparent 50%),
                 radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.12) 0px, transparent 50%),
                 radial-gradient(at 0% 100%, rgba(254, 240, 138, 0.2) 0px, transparent 50%);
@@ -46,7 +49,7 @@
             overflow-x: hidden;
         }
 
-        /* ----- THỦ CÔNG CÁC KHU VỰC HOA LÁ TRANG TRÍ DỰA TRÊN SVG ----- */
+        /* ----- HOA LÁ TRANG TRÍ DỰA TRÊN SVG ----- */
         .floral-bg-top {
             position: fixed;
             top: -25px;
@@ -135,7 +138,7 @@
         .app-title {
             font-size: 24px;
             font-weight: 700;
-            color: #065f46;
+            color: #312e81; /* Xanh Indigo Đậm */
             display: flex;
             align-items: center;
             gap: 10px;
@@ -144,19 +147,19 @@
         }
 
         .app-title .pro-tag {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
             font-size: 11px;
             padding: 3px 8px;
             border-radius: 12px;
             vertical-align: middle;
             letter-spacing: 0.5px;
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
         }
 
         .owner-badge {
             background: rgba(255, 255, 255, 0.85);
-            border: 1.5px solid #a7f3d0;
+            border: 1.5px solid #c7d2fe;
             padding: 6px 14px;
             border-radius: 20px;
             display: flex;
@@ -168,8 +171,8 @@
 
         .owner-badge .owner-icon { font-size: 14px; }
         .owner-badge .owner-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #047857; letter-spacing: 0.5px; }
-        .owner-badge .owner-class { font-size: 11px; color: #065f46; font-weight: 500; }
+        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #3730a3; letter-spacing: 0.5px; }
+        .owner-badge .owner-class { font-size: 11px; color: #4338ca; font-weight: 500; }
 
         .controls { 
             display: flex; 
@@ -182,7 +185,7 @@
             border-radius: 16px; 
             box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
             margin-bottom: 20px;
-            border: 1.5px solid rgba(167, 243, 208, 0.5);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
             position: relative;
         }
 
@@ -206,8 +209,8 @@
         }
 
         .controls select:focus, .controls input[type="number"]:focus {
-            border-color: #10b981;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
         }
 
         .btn { 
@@ -239,7 +242,7 @@
             align-items: flex-start;
         }
 
-        /* BẢNG DỮ LIỆU THIẾT KẾ MỚI */
+        /* BẢNG DỮ LIỆU */
         .table-container { 
             flex: 1; 
             background: var(--card-bg); 
@@ -247,7 +250,7 @@
             border-radius: 16px; 
             padding: 16px; 
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
-            border: 1.5px solid rgba(167, 243, 208, 0.5);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
             overflow-x: auto; 
             position: relative;
         }
@@ -259,7 +262,7 @@
             table-layout: fixed; 
         }
 
-        /* HEADER BẢNG DỊU MẮT & TRANG TRÍ */
+        /* HEADER BẢNG - TÔNG XANH DƯƠNG / INDIGO KHÔNG TRÙNG ĐÁP ÁN ĐÚNG */
         th { 
             background: linear-gradient(135deg, var(--header-bg-start), var(--header-bg-end)) !important;
             color: var(--header-text) !important;
@@ -268,12 +271,12 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 12px 8px !important;
-            border-top: 1px solid #a7f3d0 !important;
-            border-bottom: 1.5px solid #6ee7b7 !important;
+            border-top: 1px solid var(--header-border) !important;
+            border-bottom: 2px solid #a5b4fc !important;
         }
 
-        th:first-child { border-left: 1px solid #a7f3d0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        th:last-child { border-right: 1px solid #a7f3d0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        th:first-child { border-left: 1px solid var(--header-border); border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:last-child { border-right: 1px solid var(--header-border); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         td { 
             border-bottom: 1px solid #f1f5f9; 
@@ -284,7 +287,7 @@
         }
 
         tr:hover td {
-            background-color: rgba(236, 253, 245, 0.6);
+            background-color: rgba(238, 242, 255, 0.6);
         }
 
         /* CỘT CHỮ HÁN */
@@ -323,15 +326,16 @@
         }
 
         input[type="text"]:focus {
-            border-color: #10b981;
+            border-color: #6366f1;
             background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
+        /* ĐÁP ÁN ĐÚNG LÀ MÀU XANH LÁ RÕ RÀNG NỔI BẬT */
         tr.row-correct td { background-color: var(--success-light) !important; color: #065f46; }
         tr.row-wrong td { background-color: var(--danger-light) !important; color: #991b1b; }
 
-        /* BẢNG THỐNG KÊ TRANG TRÍ NÂNG CẤP */
+        /* BẢNG THỐNG KÊ */
         .stats-dashboard { 
             width: 250px; 
             background: var(--card-bg); 
@@ -339,7 +343,7 @@
             border-radius: 16px; 
             padding: 18px; 
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
-            border: 1.5px solid rgba(167, 243, 208, 0.5);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
             position: relative;
         }
 
@@ -418,22 +422,18 @@
 </head>
 <body>
 
-    <!-- SVG HỌA TIẾT HOA LÁ TRANG TRÍ LỚN GÓC TRÊN TRÁI -->
+    <!-- SVG HỌA TIẾT HOA LÁ TRANG TRÍ -->
     <svg class="floral-bg-top" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 120C10 80 50 20 110 40C140 10 200 30 190 80C230 100 210 180 160 170C140 220 70 200 50 160C10 150 0 130 20 120Z" fill="#a7f3d0"/>
-        <!-- Bông hoa anh đào/hoa mai vàng nhạt -->
         <circle cx="100" cy="80" r="42" fill="#fef08a" opacity="0.6"/>
         <circle cx="150" cy="115" r="48" fill="#fbcfe8" opacity="0.65"/>
         <circle cx="70" cy="130" r="30" fill="#fed7aa" opacity="0.5"/>
-        <!-- Các nhánh lá uốn lượn -->
         <path d="M10 10Q70 100 140 110" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
         <path d="M40 50Q20 120 90 140" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
-        <!-- Lá nhỏ lẻ -->
         <path d="M110 105 Q 130 90 140 105 Q 120 120 110 105 Z" fill="#047857"/>
         <path d="M60 85 Q 80 70 90 85 Q 70 100 60 85 Z" fill="#059669"/>
     </svg>
 
-    <!-- SVG HỌA TIẾT HOA LÁ TRANG TRÍ LỚN GÓC DƯỚI PHẢI -->
     <svg class="floral-bg-bottom" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 120C10 80 50 20 110 40C140 10 200 30 190 80C230 100 210 180 160 170C140 220 70 200 50 160C10 150 0 130 20 120Z" fill="#bbf7d0"/>
         <circle cx="110" cy="90" r="45" fill="#fed7aa" opacity="0.6"/>
@@ -442,7 +442,6 @@
         <path d="M120 100 Q 140 85 150 100 Q 130 115 120 100 Z" fill="#047857"/>
     </svg>
 
-    <!-- LÁ CÂY RẢI RÁC XUNG QUANH NỀN -->
     <svg class="floral-leaf-1" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M20 80 C 10 40, 60 10, 80 20 C 90 50, 40 90, 20 80 Z" fill="#6ee7b7"/>
         <path d="M20 80 Q 50 50 80 20" stroke="#047857" stroke-width="2"/>
