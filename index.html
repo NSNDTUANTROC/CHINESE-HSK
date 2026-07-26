@@ -16,7 +16,7 @@
             --danger: #dc2626;
             --danger-light: rgba(254, 226, 226, 0.85);
             --warning: #f59e0b;
-            --card-bg: rgba(255, 255, 255, 0.88);
+            --card-bg: rgba(255, 255, 255, 0.9);
             --text-dark: #0f172a;
             --text-muted: #475569;
             
@@ -108,74 +108,96 @@
         .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #db2777; letter-spacing: 0.5px; }
         .owner-badge .owner-class { font-size: 11px; color: #4f46e5; font-weight: 600; }
 
+        /* KHU VỰC ĐIỀU KHIỂN NÂNG CẤP ĐẸP MẮT */
         .controls { 
             display: flex; 
             gap: 12px; 
             flex-wrap: wrap; 
             align-items: center; 
             background: var(--card-bg); 
-            backdrop-filter: blur(12px);
-            padding: 14px 18px; 
-            border-radius: 16px; 
-            box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
+            backdrop-filter: blur(14px);
+            padding: 16px 20px; 
+            border-radius: 20px; 
+            box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.18);
             margin-bottom: 20px;
-            border: 2px solid rgba(244, 114, 182, 0.4);
+            border: 2px solid rgba(244, 114, 182, 0.5);
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 6px 12px;
+            border-radius: 12px;
+            border: 1.5px solid #fbcfe8;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
         .controls label {
             font-weight: 600;
             font-size: 13px;
-            color: #1e293b;
+            color: #334155;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 5px;
+            white-space: nowrap;
         }
 
         .controls select, .controls input[type="number"] {
-            padding: 7px 10px;
+            padding: 5px 8px;
             border: 1.5px solid #cbd5e1;
             border-radius: 8px;
             outline: none;
             font-weight: 600;
-            background: #ffffff;
+            color: #1e293b;
+            background: #f8fafc;
             transition: all 0.2s;
+            font-size: 13px;
         }
 
-        .range-group {
+        .controls select:focus, .controls input[type="number"]:focus {
+            border-color: #ec4899;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.2);
+        }
+
+        .range-wrapper {
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            background: rgba(240, 243, 250, 0.8);
-            padding: 4px 8px;
-            border-radius: 10px;
-            border: 1.5px dashed #cbd5e1;
+            gap: 6px;
+            background: rgba(241, 245, 249, 0.9);
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
         }
-        .range-group input {
-            width: 50px;
+        .range-wrapper input {
+            width: 48px;
             text-align: center;
         }
 
         .btn { 
-            padding: 8px 16px; 
+            padding: 9px 18px; 
             border: none; 
-            border-radius: 10px; 
+            border-radius: 12px; 
             cursor: pointer; 
             font-weight: 600; 
             color: white; 
             font-size: 13px; 
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
             transition: all 0.2s ease;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
         }
 
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 6px 15px rgba(0,0,0,0.18); }
+        .btn:active { transform: translateY(0); }
 
-        .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+        .btn-green { background: linear-gradient(135deg, #10b981, #047857); }
         .btn-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
-        .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-orange { background: linear-gradient(135deg, #f59e0b, #b45309); }
+        .btn-red { background: linear-gradient(135deg, #ef4444, #b91c1c); }
         
         .main-layout { 
             display: flex; 
@@ -339,39 +361,43 @@
 
         <div class="controls">
             <label class="btn btn-green">
-                📁 Chọn Excel
+                📂 Chọn Excel
                 <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
             </label>
             
-            <label>Chế độ: 
+            <div class="control-item">
+                <label>🎯 Chế độ:</label>
                 <select id="modeSelect">
-                    <option value="pinyin_to_chinese">Gõ Pinyin/Tiếng Trung</option>
+                    <option value="pinyin_to_chinese">Gõ Pinyin / Tiếng Trung</option>
                     <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt</option>
                 </select>
-            </label>
+            </div>
 
-            <label>Kiểu trộn:
+            <div class="control-item">
+                <label>🔄 Trộn:</label>
                 <select id="shuffleSelect">
-                    <option value="random">🔀 Đảo ngẫu nhiên</option>
                     <option value="sequential">🔢 Theo thứ tự</option>
+                    <option value="random">🔀 Đảo ngẫu nhiên</option>
                 </select>
-            </label>
+            </div>
 
-            <label>Số câu: 
-                <input type="number" id="quizSize" value="10" min="1" style="width: 45px; text-align: center;">
-            </label>
+            <div class="control-item">
+                <label>📝 Số câu:</label>
+                <input type="number" id="quizSize" value="10" min="1" style="width: 50px; text-align: center;">
+            </div>
 
-            <label>Khoảng câu:
-                <div class="range-group">
+            <div class="control-item">
+                <label>📊 Khoảng:</label>
+                <div class="range-wrapper">
                     <input type="number" id="rangeFrom" placeholder="Từ" min="1" value="1">
                     <span>đến</span>
                     <input type="number" id="rangeTo" placeholder="Đến" min="1" value="100">
                 </div>
-            </label>
+            </div>
 
-            <button class="btn btn-purple" id="btnNewQuiz">🔀 Đổi đề</button>
-            <button class="btn btn-orange" id="btnRetryQuiz">🔄 Làm lại</button>
-            <button class="btn btn-red" id="btnReset">🗑 Xóa data</button>
+            <button class="btn btn-purple" id="btnNewQuiz">⚡ Đổi đề</button>
+            <button class="btn btn-orange" id="btnRetryQuiz">♻️ Làm lại</button>
+            <button class="btn btn-red" id="btnReset">🗑️ Xóa data</button>
             <span id="loadingStatus" style="font-size: 13px; font-weight: 600; color: var(--success); margin-left: auto;"></span>
         </div>
 
@@ -430,7 +456,7 @@
         let timerInterval = null;
         let secondsElapsed = 0;
         let isTimerRunning = false;
-        let sequentialOffset = 0; // Biến ghi nhớ vị trí hiện tại cho chế độ theo thứ tự
+        let sequentialOffset = 0;
 
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
@@ -545,24 +571,18 @@
                 const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
                 processedData = shuffled.slice(0, Math.min(size, slicedData.length));
             } else {
-                // Chế độ theo thứ tự: bốc tiếp nối tiếp, hết khoảng thì quay vòng về đầu
                 if (sequentialOffset >= slicedData.length) {
-                    sequentialOffset = 0; // Quay vòng từ đầu
+                    sequentialOffset = 0;
                 }
-                
                 processedData = slicedData.slice(sequentialOffset, sequentialOffset + size);
-                
-                // Cập nhật offset cho lần bấm tiếp theo
                 sequentialOffset += size;
             }
 
             currentQuizData = processedData;
-            
             resetTimer(); 
             renderTable();
         }
 
-        // Khi người dùng đổi kiểu trộn (Random <-> Theo thứ tự), reset lại offset để đồng bộ
         document.getElementById('shuffleSelect').addEventListener('change', function() {
             sequentialOffset = 0;
         });
@@ -631,7 +651,6 @@
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
             const rowTr = document.getElementById(`row_${index}`);
-            const isPinyinMode = (mode === 'pinyin_to_chinese');
 
             if (inputVal === '') {
                 return;
