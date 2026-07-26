@@ -19,7 +19,7 @@
             --danger: #dc2626;
             --danger-light: rgba(254, 226, 226, 0.85);
             --warning: #f59e0b;
-            --card-bg: rgba(255, 255, 255, 0.82); /* Làm trong suốt để lộ ảnh nền */
+            --card-bg: rgba(255, 255, 255, 0.82); /* Kính mờ làm hiện ảnh nền bên dưới */
             --text-dark: #0f172a;
             --text-muted: #475569;
             
@@ -39,10 +39,10 @@
             position: relative;
             min-height: 100vh;
             overflow-x: hidden;
-            background-color: #e2e8f0;
+            background-color: #cbd5e1;
         }
 
-        /* 📸 LỚP ẢNH NỀN MỜ PHỦ TOÀN BỘ TRANG WEB */
+        /* 🌸 LỚP ẢNH NỀN HÌNH 2 BÉ MỜ PHỦ TOÀN BỘ WEB */
         body::before {
             content: "";
             position: fixed;
@@ -50,11 +50,11 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('bg.jpg'); /* Đảm bảo file ảnh tên là bg.jpg trên GitHub */
+            background-image: url('bg.jpg'); /* Đã nhận file bg.jpg chuẩn trên GitHub */
             background-repeat: no-repeat;
             background-position: center center;
             background-size: cover;
-            opacity: 0.35; /* Đã tăng lên 0.35 để nhìn rõ hình 2 bé */
+            opacity: 0.35; /* Độ mờ vừa đủ nổi hình 2 bé mà không rối chữ */
             z-index: -1;
             pointer-events: none;
         }
