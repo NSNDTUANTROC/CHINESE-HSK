@@ -2,7 +2,8 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Thêm user-scalable=no và maximum-scale=1.0 để chặn điện thoại tự động zoom -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK</title>
     <!-- Thư viện SheetJS đọc file Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -97,7 +98,7 @@
             border: 1px solid #ccc; 
             border-radius: 4px; 
             text-align: center; 
-            font-size: 13px; 
+            font-size: 14px; 
         }
         
         .correct { color: #28a745; font-weight: bold; }
@@ -123,19 +124,21 @@
             font-size: 12px; 
         }
 
+        /* Tối ưu riêng cho màn hình điện thoại nhỏ */
         @media (max-width: 600px) {
             body { margin: 5px; font-size: 12px; }
             .controls { padding: 8px; gap: 6px; justify-content: center; }
             .btn { padding: 5px 8px; font-size: 11px; }
             .container { flex-direction: column; gap: 10px; }
             .table-container { padding: 4px; }
-            th, td { padding: 5px 2px; font-size: 11px; }
+            th, td { padding: 5px 2px; font-size: 12px; }
             .col-stt, .col-type, .col-status { display: none; }
-            .col-hanzi { width: 26%; font-size: 14px; }
+            .col-hanzi { width: 26%; font-size: 15px; }
             .col-pinyin { width: 22%; }
             .col-viet { width: 28%; }
             .col-input { width: 24%; }
-            input[type="text"] { font-size: 12px; padding: 4px 0; width: 95%; }
+            /* Cỡ chữ ô input 16px để triệt tiêu hoàn toàn tính năng auto-zoom của điện thoại */
+            input[type="text"] { font-size: 16px; padding: 4px 0; width: 95%; }
             .stats-card { width: auto; margin-top: 5px; }
         }
     </style>
@@ -308,15 +311,9 @@
             });
 
             updateStats();
-            
-            // Tự động focus câu đầu tiên
-            setTimeout(() => {
-                const firstInput = document.getElementById('input_0');
-                if (firstInput) firstInput.focus();
-            }, 100);
         }
 
-        // Tự động nhảy ô ngay khi VỪA CHỌN CHỮ HÁN từ bàn phím điện thoại
+        // Tự động nhảy ô khi gõ xong chữ Hán trên di động
         function handleCompositionEnd(index) {
             setTimeout(() => {
                 moveToNext(index);
@@ -379,7 +376,7 @@
                 statusTd.className = 'col-status wrong';
             }
 
-            // Mở hiện thông tin bị ẩn
+            // Hiện thông tin chi tiết
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
