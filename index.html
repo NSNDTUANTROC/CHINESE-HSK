@@ -7,7 +7,7 @@
     <!-- Thư viện SheetJS đọc file Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* ================= CSS GIAO DIỆN CHUNG (MÁY TÍNH) ================= */
+        /* ================= CSS GIAO DIỆN CHUNG ================= */
         body { 
             font-family: Arial, sans-serif; 
             margin: 15px; 
@@ -82,7 +82,7 @@
             font-size: 13px; 
         }
         
-        /* Chia tỉ lệ cột trên máy tính */
+        /* Tỉ lệ các cột */
         .col-stt { width: 6%; }
         .col-hanzi { width: 18%; font-size: 16px; font-weight: bold; }
         .col-type { width: 12%; }
@@ -123,31 +123,19 @@
             font-size: 12px; 
         }
 
-        /* ================= CSS CHO ĐIỆN THOẠI (GỌN MÀN HÌNH) ================= */
         @media (max-width: 600px) {
             body { margin: 5px; font-size: 12px; }
-            
             .controls { padding: 8px; gap: 6px; justify-content: center; }
             .btn { padding: 5px 8px; font-size: 11px; }
-            .controls select, .controls input[type="number"] { font-size: 11px; }
-
             .container { flex-direction: column; gap: 10px; }
-            .table-container { padding: 4px; overflow-x: visible; }
-            
+            .table-container { padding: 4px; }
             th, td { padding: 5px 2px; font-size: 11px; }
-            th { font-size: 10px; }
-            
-            /* Ẩn cột STT, Loại từ, Đúng/Sai trên điện thoại để không bị chật */
             .col-stt, .col-type, .col-status { display: none; }
-            
-            /* Tỉ lệ 4 cột chính còn lại trên điện thoại */
             .col-hanzi { width: 26%; font-size: 14px; }
             .col-pinyin { width: 22%; }
             .col-viet { width: 28%; }
             .col-input { width: 24%; }
-
             input[type="text"] { font-size: 12px; padding: 4px 0; width: 95%; }
-            
             .stats-card { width: auto; margin-top: 5px; }
         }
     </style>
@@ -206,19 +194,17 @@
     </div>
 
     <script>
-        // Dữ liệu từ vựng dự phòng (mặc định)
         const EMBEDDED_VOCAB_DATA = [
-            {"chinese": "你", "type": "Đại từ", "pinyin": "nǐ", "meaning": "Bạn, anh, chị, cậu"},
-            {"chinese": "好", "type": "Tính từ", "pinyin": "hǎo", "meaning": "Tốt, khỏe, ngon, đẹp"},
-            {"chinese": "你好", "type": "Cụm từ", "pinyin": "nǐ hǎo", "meaning": "Xin chào"},
-            {"chinese": "一", "type": "Số từ", "pinyin": "yī", "meaning": "Một"},
-            {"chinese": "五", "type": "Số từ", "pinyin": "wǔ", "meaning": "Năm (số 5)"}
+            {"chinese": "工人", "type": "Danh từ", "pinyin": "gōngrén", "meaning": "Công nhân"},
+            {"chinese": "经理", "type": "Danh từ", "pinyin": "jīnglǐ", "meaning": "Giám đốc"},
+            {"chinese": "谁", "type": "Đại từ", "pinyin": "shéi / shuí", "meaning": "Ai"},
+            {"chinese": "包子", "type": "Danh từ", "pinyin": "bāozi", "meaning": "Bánh bao (có nhân)"},
+            {"chinese": "睡觉", "type": "Động từ", "pinyin": "shuì jiào", "meaning": "Ngủ"}
         ];
 
         let fullVocabData = [];
         let currentQuizData = [];
 
-        // Khởi tạo ứng dụng
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
             if (savedData) {
@@ -233,7 +219,7 @@
             startNewQuiz();
         };
 
-        // HÀM XỬ LÝ ĐỌC FILE EXCEL CỦA NGƯỜI DÙNG (TƯƠNG THÍCH HOÀN TOÀN MOBILE)
+        // Đọc File Excel
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -242,8 +228,6 @@
             if (statusText) statusText.innerText = "⏳ Đang nạp...";
 
             const reader = new FileReader();
-
-            // Đọc dạng BinaryString giúp chạy mượt trên mọi điện thoại (iOS Safari / Android Chrome)
             reader.onload = function(e) {
                 try {
                     const data = e.target.result;
@@ -258,7 +242,6 @@
                         return;
                     }
 
-                    // Tự động nhận diện nhiều dạng tên cột tiếng Việt / tiếng Anh khác nhau
                     fullVocabData = json.map(row => ({
                         chinese: row['CHENESE'] || row['Tiếng Trung'] || row['Chữ Hán'] || row['Word'] || row['Chinese'] || row['CHỮ HÁN'] || '',
                         type: row['VOCABULARY'] || row['Loại từ'] || row['Type'] || row['LOẠI TỪ'] || '',
@@ -266,24 +249,19 @@
                         meaning: row['MEANING'] || row['Tiếng Việt'] || row['Nghĩa'] || row['Meaning'] || row['NGHĨA TIẾNG VIỆT'] || ''
                     })).filter(item => item.chinese || item.meaning);
 
-                    // Lưu vào bộ nhớ trình duyệt điện thoại
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
-
                     if (statusText) statusText.innerText = "✅ Đã nạp xong!";
-                    
                     startNewQuiz();
-                    alert("Thành công! Đã nạp " + fullVocabData.length + " từ vựng từ file của bạn.");
+                    alert("Thành công! Đã nạp " + fullVocabData.length + " từ vựng.");
 
                 } catch (err) {
                     alert("Lỗi đọc file: " + err.message);
                     if (statusText) statusText.innerText = "❌ Lỗi file";
                 }
             };
-
             reader.readAsBinaryString(file);
         });
 
-        // Đổi bộ câu hỏi ngẫu nhiên mới
         function startNewQuiz() {
             if (!fullVocabData || fullVocabData.length === 0) {
                 fullVocabData = [...EMBEDDED_VOCAB_DATA];
@@ -294,13 +272,11 @@
             renderTable();
         }
 
-        // Làm lại bộ câu hỏi hiện tại
         function retryCurrentQuiz() {
             if (currentQuizData.length === 0) return;
             renderTable();
         }
 
-        // Hiển thị dữ liệu ra bảng
         function renderTable() {
             const tbody = document.getElementById('vocabTable');
             const mode = document.getElementById('modeSelect').value;
@@ -308,10 +284,10 @@
 
             currentQuizData.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
-                const pinyinDisplay = isPinyinMode ? '***' : item.pinyin;
+                
                 const chineseDisplay = isPinyinMode ? '***' : item.chinese;
+                const pinyinDisplay = '***'; // Ẩn Pinyin ở cả 2 chế độ
                 const meaningDisplay = !isPinyinMode ? '***' : item.meaning;
 
                 tr.innerHTML = `
@@ -320,18 +296,56 @@
                     <td class="col-type">${item.type}</td>
                     <td id="pinyin_${index}" class="col-pinyin">${pinyinDisplay}</td>
                     <td id="meaning_${index}" class="col-viet">${meaningDisplay}</td>
-                    <td class="col-input"><input type="text" id="input_${index}" oninput="checkAnswer(${index})"></td>
+                    <td class="col-input">
+                        <input type="text" id="input_${index}" 
+                               enterkeyhint="next" 
+                               oncompositionend="handleCompositionEnd(${index})"
+                               onkeydown="handleKeyDown(event, ${index})">
+                    </td>
                     <td id="status_${index}" class="col-status">-</td>
                 `;
                 tbody.appendChild(tr);
             });
 
             updateStats();
+            
+            // Tự động focus câu đầu tiên
+            setTimeout(() => {
+                const firstInput = document.getElementById('input_0');
+                if (firstInput) firstInput.focus();
+            }, 100);
         }
 
-        // Kiểm tra đáp án khi gõ vào ô nhập
+        // Tự động nhảy ô ngay khi VỪA CHỌN CHỮ HÁN từ bàn phím điện thoại
+        function handleCompositionEnd(index) {
+            setTimeout(() => {
+                moveToNext(index);
+            }, 80);
+        }
+
+        function moveToNext(index) {
+            checkAnswer(index);
+            const nextInput = document.getElementById(`input_${index + 1}`);
+            if (nextInput) {
+                setTimeout(() => {
+                    nextInput.focus();
+                    if (nextInput.select) nextInput.select();
+                }, 100);
+            }
+        }
+
+        function handleKeyDown(event, index) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault();
+                moveToNext(index);
+            }
+        }
+
         function checkAnswer(index) {
-            const inputVal = document.getElementById(`input_${index}`).value.trim().toLowerCase();
+            const inputEl = document.getElementById(`input_${index}`);
+            if (!inputEl) return;
+            
+            const inputVal = inputEl.value.trim().toLowerCase();
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
             const statusTd = document.getElementById(`status_${index}`);
@@ -360,18 +374,19 @@
             if (isCorrect) {
                 statusTd.innerText = '✓ Đúng';
                 statusTd.className = 'col-status correct';
-                document.getElementById(`chinese_${index}`).innerText = item.chinese;
-                document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
-                document.getElementById(`meaning_${index}`).innerText = item.meaning;
             } else {
                 statusTd.innerText = '✗ Sai';
                 statusTd.className = 'col-status wrong';
             }
 
+            // Mở hiện thông tin bị ẩn
+            document.getElementById(`chinese_${index}`).innerText = item.chinese;
+            document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
+            document.getElementById(`meaning_${index}`).innerText = item.meaning;
+
             updateStats();
         }
 
-        // Cập nhật thẻ thống kê kết quả
         function updateStats() {
             const total = currentQuizData.length;
             let done = 0, correct = 0, wrong = 0;
@@ -398,7 +413,6 @@
             document.getElementById('statRate').innerText = `${rate}%`;
         }
 
-        // Gắn sự kiện cho các nút điều khiển
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
         document.getElementById('modeSelect').addEventListener('change', renderTable);
