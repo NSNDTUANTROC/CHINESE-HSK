@@ -31,7 +31,7 @@
             box-sizing: border-box;
         }
 
-        /* HEADER & APP CONTAINER */
+        /* HEADER & CONTAINER */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -110,7 +110,7 @@
             align-items: flex-start;
         }
 
-        /* BANG DỮ LIỆU */
+        /* BẢNG DỮ LIỆU */
         .table-container { 
             flex: 1; 
             background: var(--card-bg); 
@@ -128,15 +128,22 @@
             table-layout: fixed; 
         }
 
+        /* TÔ MÀU VÀ ĐỒNG BỘ CHỮ CHO THANH TIÊU ĐỀ (TH) */
         th { 
-            background-color: #f8fafc; 
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 12px;
+            background: linear-gradient(135deg, #4f46e5, #6366f1) !important; /* Tô màu tím nổi bật */
+            color: #ffffff !important; /* Chữ trắng rõ ràng */
+            font-weight: 700 !important;
+            font-size: 13px !important;
+            font-style: normal !important;
             text-transform: uppercase;
-            padding: 12px 8px;
-            border-bottom: 2px solid #e2e8f0;
+            letter-spacing: 0.5px;
+            padding: 14px 8px !important;
+            border: none !important;
         }
+
+        /* Bo góc thanh tiêu đề */
+        th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         td { 
             border-bottom: 1px solid #f1f5f9; 
@@ -146,18 +153,28 @@
             transition: background-color 0.2s ease;
         }
 
-        .col-hanzi { 
+        /* Kiểu dáng chữ cho các CỘT NỘI DUNG (TD) */
+        td.col-hanzi { 
             font-family: 'Noto Sans SC', sans-serif;
             font-size: 18px; 
             font-weight: 700; 
         }
+        td.col-pinyin { 
+            color: #475569; 
+            font-style: italic; 
+        }
+        td.col-stt { color: var(--text-muted); }
+        td.col-type { color: var(--text-muted); font-size: 12px; }
+        td.col-viet { font-weight: 500; }
+        td.col-status { font-weight: 700; }
 
-        .col-stt { width: 6%; color: var(--text-muted); }
-        .col-type { width: 12%; color: var(--text-muted); font-size: 12px; }
-        .col-pinyin { width: 16%; color: #475569; font-style: italic; }
-        .col-viet { width: 25%; font-weight: 500; }
+        .col-stt { width: 6%; }
+        .col-hanzi { width: 18%; }
+        .col-type { width: 12%; }
+        .col-pinyin { width: 16%; }
+        .col-viet { width: 25%; }
         .col-input { width: 18%; }
-        .col-status { width: 8%; font-weight: 700; }
+        .col-status { width: 8%; }
 
         input[type="text"] { 
             width: 85%; 
@@ -177,7 +194,7 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
         
-        /* MÀU KHI ĐÚNG/SAI */
+        /* MÀU DÒNG ĐÚNG/SAI */
         tr.row-correct td { 
             background-color: var(--success-light) !important; 
             color: #065f46;
@@ -187,7 +204,7 @@
             color: #991b1b;
         }
 
-        /* CỘT THỐNG KÊ DASHBOARD */
+        /* BẢNG THỐNG KÊ */
         .stats-dashboard { 
             width: 240px; 
             background: var(--card-bg); 
@@ -525,7 +542,6 @@
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
             document.getElementById('statRate').innerText = `${rate}%`;
 
-            // Cập nhật thanh tiến độ (Progress bar)
             const progressPercent = total > 0 ? (done / total) * 100 : 0;
             document.getElementById('progressBar').style.width = `${progressPercent}%`;
         }
