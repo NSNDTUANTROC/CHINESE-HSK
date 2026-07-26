@@ -543,7 +543,6 @@
                 const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
                 processedData = shuffled.slice(0, Math.min(size, slicedData.length));
             } else {
-                // Theo thứ tự
                 processedData = slicedData.slice(0, Math.min(size, slicedData.length));
             }
 
@@ -695,8 +694,9 @@
 
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
-        document.getElementById('modeSelect').addEventListener('change', startNewQuiz);
-        document.getElementById('shuffleSelect').addEventListener('change', startNewQuiz);
+        
+        // Đã xóa sự kiện tự động đổi đề khi thay đổi cấu hình, chỉ đổi đề khi bấm nút "Đổi đề"
+        
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
