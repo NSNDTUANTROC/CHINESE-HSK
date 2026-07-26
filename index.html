@@ -39,7 +39,6 @@
             background: linear-gradient(135deg, #fbcfe8 0%, #e0e7ff 50%, #bae6fd 100%);
         }
 
-        /* 🌸 HIỆU ỨNG HOA LÁ BAY RƠI LIÊN TỤC KHẮP MÀN HÌNH */
         .falling-decor {
             position: fixed;
             top: -10vh;
@@ -52,14 +51,8 @@
         }
 
         @keyframes fall {
-            0% {
-                transform: translateY(-10vh) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(110vh) rotate(360deg);
-                opacity: 0.2;
-            }
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.2; }
         }
 
         .container-wrapper {
@@ -270,6 +263,17 @@
 
         .stats-dashboard h3 { font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; color: #db2777; font-weight: 700; }
 
+        .timer-box {
+            background: linear-gradient(135deg, #e0e7ff, #fce7f3);
+            border: 1.5px solid #f472b6;
+            border-radius: 12px;
+            padding: 10px;
+            text-align: center;
+            margin-bottom: 14px;
+        }
+        .timer-box .timer-label { font-size: 11px; color: #4f46e5; font-weight: 700; text-transform: uppercase; }
+        .timer-box .timer-value { font-size: 20px; font-weight: 800; color: #db2777; margin-top: 2px; font-family: monospace; }
+
         .progress-bar-bg { width: 100%; height: 8px; background-color: rgba(203, 213, 225, 0.6); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
         .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ec4899, #8b5cf6); transition: width 0.4s ease; }
 
@@ -293,7 +297,6 @@
 </head>
 <body>
 
-    <!-- 🌸 HỆ THỐNG HOA LÁ BAY TỰ ĐỘNG KHẮP MÀN HÌNH -->
     <script>
         const symbols = ['🌸', '🌺', '🌷', '🌻', '🍃', '🍀', '✨', '💮'];
         for (let i = 0; i < 22; i++) {
@@ -362,6 +365,11 @@
             </div>
 
             <div class="stats-dashboard">
+                <div class="timer-box">
+                    <div class="timer-label">⏱ Thời gian làm bài</div>
+                    <div class="timer-value" id="timerDisplay">00:00</div>
+                </div>
+
                 <h3>📊 Tiến độ bài tập</h3>
                 <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
                 <div class="stats-grid">
@@ -390,6 +398,9 @@
 
         let fullVocabData = [];
         let currentQuizData = [];
+        let timerInterval = null;
+        let secondsElapsed = 0;
+        let isTimerRunning = false;
 
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
@@ -401,6 +412,35 @@
             }
             startNewQuiz();
         };
+
+        function resetTimer() {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            secondsElapsed = 0;
+            isTimerRunning = false;
+            updateTimerDisplay();
+        }
+
+        function checkAndStartTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(() => {
+                    secondsElapsed++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+            document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
+        }
 
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -445,10 +485,16 @@
             const size = parseInt(document.getElementById('quizSize').value) || 10;
             const shuffled = [...fullVocabData].sort(() => 0.5 - Math.random());
             currentQuizData = shuffled.slice(0, Math.min(size, fullVocabData.length));
+            resetTimer(); // Đổi đề xong reset đồng hồ về 00:00, chờ gõ mới chạy
             renderTable();
         }
 
-        function retryCurrentQuiz() { if (currentQuizData.length > 0) renderTable(); }
+        function retryCurrentQuiz() { 
+            if (currentQuizData.length > 0) {
+                resetTimer();
+                renderTable();
+            } 
+        }
 
         function renderTable() {
             const tbody = document.getElementById('vocabTable');
@@ -469,7 +515,8 @@
                     <td class="col-input">
                         <input type="text" id="input_${index}" 
                                enterkeyhint="next" 
-                               oncompositionend="handleCompositionEnd(${index})"
+                               oninput="checkAndStartTimer()"
+                               onblur="checkAnswer(${index})"
                                onkeydown="handleKeyDown(event, ${index})">
                     </td>
                     <td id="status_${index}" class="col-status">-</td>
@@ -479,41 +526,36 @@
             updateStats();
         }
 
-        function handleCompositionEnd(index) { setTimeout(() => { moveToNext(index); }, 80); }
-
-        function moveToNext(index) {
-            checkAnswer(index);
-            const nextInput = document.getElementById(`input_${index + 1}`);
-            if (nextInput) {
-                setTimeout(() => {
-                    nextInput.focus();
-                    if (nextInput.select) nextInput.select();
-                }, 100);
-            }
-        }
-
         function handleKeyDown(event, index) {
+            checkAndStartTimer();
             if (event.key === 'Enter' || event.keyCode === 13) {
                 event.preventDefault();
-                moveToNext(index);
+                checkAnswer(index); 
+                
+                const nextInput = document.getElementById(`input_${index + 1}`);
+                if (nextInput) {
+                    nextInput.focus();
+                    if (nextInput.select) nextInput.select();
+                }
             }
         }
 
         function checkAnswer(index) {
+            const statusTd = document.getElementById(`status_${index}`);
+            if (statusTd && (statusTd.innerText.includes('Đúng') || statusTd.innerText.includes('Sai'))) {
+                return;
+            }
+
             const inputEl = document.getElementById(`input_${index}`);
             if (!inputEl) return;
             
             const inputVal = inputEl.value.trim().toLowerCase();
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
-            const statusTd = document.getElementById(`status_${index}`);
             const rowTr = document.getElementById(`row_${index}`);
+            const isPinyinMode = (mode === 'pinyin_to_chinese');
 
             if (inputVal === '') {
-                statusTd.innerText = '-';
-                statusTd.className = 'col-status';
-                rowTr.className = '';
-                updateStats();
                 return;
             }
 
@@ -545,16 +587,19 @@
                 statusTd.innerText = '✓ Đúng';
                 statusTd.style.color = 'var(--success)';
                 rowTr.className = 'row-correct'; 
+                document.getElementById(`chinese_${index}`).innerText = item.chinese;
+                document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
+                document.getElementById(`meaning_${index}`).innerText = item.meaning;
             } else {
                 statusTd.innerText = '✗ Sai';
                 statusTd.style.color = 'var(--danger)';
                 rowTr.className = 'row-wrong'; 
+                document.getElementById(`chinese_${index}`).innerText = item.chinese;
+                document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
+                document.getElementById(`meaning_${index}`).innerText = item.meaning;
             }
 
-            document.getElementById(`chinese_${index}`).innerText = item.chinese;
-            document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
-            document.getElementById(`meaning_${index}`).innerText = item.meaning;
-
+            inputEl.disabled = true;
             updateStats();
         }
 
@@ -578,11 +623,15 @@
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
             document.getElementById('statRate').innerText = `${rate}%`;
             document.getElementById('progressBar').style.width = `${total > 0 ? (done / total) * 100 : 0}%`;
+
+            if (done === total && total > 0) {
+                stopTimer();
+            }
         }
 
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
-        document.getElementById('modeSelect').addEventListener('change', renderTable);
+        document.getElementById('modeSelect').addEventListener('change', startNewQuiz);
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
