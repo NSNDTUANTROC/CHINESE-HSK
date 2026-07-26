@@ -430,6 +430,7 @@
         let timerInterval = null;
         let secondsElapsed = 0;
         let isTimerRunning = false;
+        let sequentialOffset = 0; // Biến ghi nhớ vị trí hiện tại cho chế độ theo thứ tự
 
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
@@ -507,6 +508,7 @@
                     
                     document.getElementById('rangeFrom').value = 1;
                     document.getElementById('rangeTo').value = fullVocabData.length;
+                    sequentialOffset = 0;
                     
                     startNewQuiz();
                 } catch (err) { alert("Lỗi đọc file Excel: " + err.message); }
@@ -543,7 +545,15 @@
                 const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
                 processedData = shuffled.slice(0, Math.min(size, slicedData.length));
             } else {
-                processedData = slicedData.slice(0, Math.min(size, slicedData.length));
+                // Chế độ theo thứ tự: bốc tiếp nối tiếp, hết khoảng thì quay vòng về đầu
+                if (sequentialOffset >= slicedData.length) {
+                    sequentialOffset = 0; // Quay vòng từ đầu
+                }
+                
+                processedData = slicedData.slice(sequentialOffset, sequentialOffset + size);
+                
+                // Cập nhật offset cho lần bấm tiếp theo
+                sequentialOffset += size;
             }
 
             currentQuizData = processedData;
@@ -551,6 +561,11 @@
             resetTimer(); 
             renderTable();
         }
+
+        // Khi người dùng đổi kiểu trộn (Random <-> Theo thứ tự), reset lại offset để đồng bộ
+        document.getElementById('shuffleSelect').addEventListener('change', function() {
+            sequentialOffset = 0;
+        });
 
         function retryCurrentQuiz() { 
             if (currentQuizData.length > 0) {
@@ -695,13 +710,12 @@
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
         
-        // Đã xóa sự kiện tự động đổi đề khi thay đổi cấu hình, chỉ đổi đề khi bấm nút "Đổi đề"
-        
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
             document.getElementById('rangeFrom').value = 1;
             document.getElementById('rangeTo').value = fullVocabData.length;
+            sequentialOffset = 0;
             startNewQuiz();
             alert("Đã khôi phục dữ liệu về mặc định!");
         });
