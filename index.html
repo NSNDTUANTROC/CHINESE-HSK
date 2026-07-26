@@ -19,10 +19,13 @@
             --danger: #ef4444;
             --danger-light: #fee2e2;
             --warning: #f59e0b;
-            --bg-body: #f0fdf4; /* Tông nền xanh lá dịu mắt */
-            --card-bg: rgba(255, 255, 255, 0.92); /* Trong suốt nhẹ nổi bật hoa lá */
+            --bg-body: #f8fafc; /* Nền xám nhạt hiện đại, dịu mắt */
+            --card-bg: rgba(255, 255, 255, 0.95);
             --text-dark: #0f172a;
             --text-muted: #64748b;
+            --header-bg-start: #ecfdf5; /* Xanh pastel nhẹ nhàng */
+            --header-bg-end: #d1fae5;
+            --header-text: #065f46;
         }
 
         body { 
@@ -30,6 +33,9 @@
             margin: 0; 
             padding: 20px;
             background-color: var(--bg-body); 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.08) 0px, transparent 50%);
             color: var(--text-dark);
             font-size: 14px; 
             box-sizing: border-box;
@@ -38,16 +44,16 @@
             overflow-x: hidden;
         }
 
-        /* HỌA TIẾT HOA LÁ TRANG TRÍ Ở CÁC GÓC */
+        /* HỌA TIẾT HOA LÁ TRANG TRÍ CÁC GÓC */
         .floral-bg-top {
             position: fixed;
             top: -20px;
             left: -20px;
-            width: 180px;
-            height: 180px;
+            width: 200px;
+            height: 200px;
             pointer-events: none;
             z-index: 0;
-            opacity: 0.65;
+            opacity: 0.5;
         }
 
         .floral-bg-bottom {
@@ -58,13 +64,13 @@
             height: 220px;
             pointer-events: none;
             z-index: 0;
-            opacity: 0.6;
+            opacity: 0.5;
             transform: rotate(180deg);
         }
 
         .container-wrapper {
             position: relative;
-            z-index: 1; /* Nổi lên trên họa tiết hoa lá */
+            z-index: 1;
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -80,43 +86,54 @@
         }
 
         .app-title {
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 700;
-            color: #166534;
+            color: #065f46;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             margin: 0;
         }
 
+        .app-title .pro-tag {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            vertical-align: middle;
+            letter-spacing: 0.5px;
+        }
+
         .owner-badge {
-            background: linear-gradient(135deg, #dcfce7, #f0fdf4);
-            border: 1px solid #86efac;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #a7f3d0;
             padding: 6px 14px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
+            backdrop-filter: blur(6px);
         }
 
         .owner-badge .owner-icon { font-size: 14px; }
         .owner-badge .owner-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #15803d; letter-spacing: 0.5px; }
-        .owner-badge .owner-class { font-size: 11px; color: #166534; font-weight: 500; }
+        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #047857; letter-spacing: 0.5px; }
+        .owner-badge .owner-class { font-size: 11px; color: #065f46; font-weight: 500; }
 
         .controls { 
             display: flex; 
-            gap: 10px; 
+            gap: 12px; 
             flex-wrap: wrap; 
             align-items: center; 
             background: var(--card-bg); 
-            backdrop-filter: blur(8px);
-            padding: 12px 16px; 
+            backdrop-filter: blur(12px);
+            padding: 14px 18px; 
             border-radius: 16px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
             margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .controls label {
@@ -135,6 +152,12 @@
             outline: none;
             font-weight: 500;
             background: #ffffff;
+            transition: all 0.2s;
+        }
+
+        .controls select:focus, .controls input[type="number"]:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
         }
 
         .btn { 
@@ -152,7 +175,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         .btn:active { transform: translateY(0); }
 
         .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
@@ -166,15 +189,15 @@
             align-items: flex-start;
         }
 
-        /* BẢNG DỮ LIỆU */
+        /* BẢNG DỮ LIỆU THIẾT KẾ MỚI */
         .table-container { 
             flex: 1; 
             background: var(--card-bg); 
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
             border-radius: 16px; 
             padding: 16px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             overflow-x: auto; 
         }
         
@@ -185,20 +208,21 @@
             table-layout: fixed; 
         }
 
+        /* HEADER BẢNG DỊU MẮT & SANG TRỌNG */
         th { 
-            background: linear-gradient(135deg, #059669, #10b981) !important;
-            color: #ffffff !important;
-            font-weight: 500 !important;
+            background: linear-gradient(135deg, var(--header-bg-start), var(--header-bg-end)) !important;
+            color: var(--header-text) !important;
+            font-weight: 600 !important;
             font-size: 13px !important;
-            font-style: normal !important;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 12px 8px !important;
-            border: none !important;
+            border-top: 1px solid #a7f3d0 !important;
+            border-bottom: 1px solid #a7f3d0 !important;
         }
 
-        th:first-child { border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        th:last-child { border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        th:first-child { border-left: 1px solid #a7f3d0; border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:last-child { border-right: 1px solid #a7f3d0; border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         td { 
             border-bottom: 1px solid #f1f5f9; 
@@ -208,19 +232,23 @@
             transition: background-color 0.2s ease;
         }
 
+        tr:hover td {
+            background-color: #f8fafc;
+        }
+
         /* CỘT CHỮ HÁN */
         td.col-hanzi { 
             font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
             font-size: 21px; 
             font-weight: 400 !important;
-            color: #1e293b;
+            color: #0f172a;
             letter-spacing: 1px;
         }
 
         td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; }
-        td.col-stt { color: var(--text-muted); }
+        td.col-stt { color: var(--text-muted); font-weight: 500; }
         td.col-type { color: var(--text-muted); font-size: 12px; }
-        td.col-viet { font-weight: 500; }
+        td.col-viet { font-weight: 500; color: #334155; }
         td.col-status { font-weight: 600; }
 
         .col-stt { width: 6%; }
@@ -246,7 +274,7 @@
         input[type="text"]:focus {
             border-color: #10b981;
             background: #ffffff;
-            box-shadow: 0 0 0 3px #d1fae5;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
         }
         
         tr.row-correct td { background-color: var(--success-light) !important; color: #065f46; }
@@ -254,21 +282,24 @@
 
         /* BẢNG THỐNG KÊ */
         .stats-dashboard { 
-            width: 240px; 
+            width: 250px; 
             background: var(--card-bg); 
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(12px);
             border-radius: 16px; 
             padding: 18px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .stats-dashboard h3 { 
-            font-size: 14px; 
-            margin: 0 0 15px 0; 
+            font-size: 13px; 
+            margin: 0 0 12px 0; 
             text-transform: uppercase;
             color: var(--text-muted);
             letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .progress-bar-bg {
@@ -277,7 +308,7 @@
             background-color: #e2e8f0;
             border-radius: 10px;
             overflow: hidden;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
 
         .progress-bar-fill {
@@ -295,16 +326,29 @@
             border-radius: 10px;
             border: 1px solid #f1f5f9;
             text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
 
         .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .stat-card .value { font-size: 16px; font-weight: 600; }
+        .stat-card .value { font-size: 16px; font-weight: 700; }
+
+        .rate-card {
+            margin-top: 12px; 
+            text-align: center; 
+            background: linear-gradient(135deg, #ecfdf5, #f0fdf4); 
+            padding: 12px; 
+            border-radius: 12px; 
+            border: 1px solid #a7f3d0;
+        }
 
         .footer-owner {
             text-align: center;
-            margin-top: 15px;
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 1px dashed #e2e8f0;
             font-size: 11px;
             color: var(--text-muted);
+            line-height: 1.4;
         }
 
         @media (max-width: 768px) {
@@ -316,31 +360,29 @@
             .col-pinyin { width: 22%; }
             .col-viet { width: 26%; }
             .col-input { width: 24%; }
-            .floral-bg-top, .floral-bg-bottom { display: none; } /* Ẩn bớt hoa trên màn hình quá nhỏ */
+            .floral-bg-top, .floral-bg-bottom { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- SVG HỌA TIẾT HOA LÁ TRANG TRÍ DỊU MẮT -->
+    <!-- SVG HỌA TIẾT HOA LÁ TRANG TRÍ -->
     <svg class="floral-bg-top" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M40 100C30 70 60 20 100 40C120 10 170 30 160 70C190 90 170 150 130 140C120 180 60 170 50 130C10 130 10 100 40 100Z" fill="#a7f3d0"/>
-        <circle cx="80" cy="70" r="35" fill="#fef08a" opacity="0.6"/>
-        <circle cx="120" cy="100" r="40" fill="#fbcfe8" opacity="0.6"/>
-        <path d="M10 10Q50 80 100 90" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
-        <path d="M30 40Q10 90 70 110" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="80" cy="70" r="35" fill="#fef08a" opacity="0.5"/>
+        <circle cx="120" cy="100" r="40" fill="#fbcfe8" opacity="0.5"/>
+        <path d="M10 10Q50 80 100 90" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
     </svg>
 
     <svg class="floral-bg-bottom" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M40 100C30 70 60 20 100 40C120 10 170 30 160 70C190 90 170 150 130 140C120 180 60 170 50 130C10 130 10 100 40 100Z" fill="#bbf7d0"/>
-        <circle cx="90" cy="80" r="38" fill="#fed7aa" opacity="0.6"/>
-        <circle cx="130" cy="110" r="35" fill="#fbcfe8" opacity="0.6"/>
-        <path d="M10 10Q50 80 100 90" stroke="#059669" stroke-width="4" stroke-linecap="round"/>
+        <circle cx="90" cy="80" r="38" fill="#fed7aa" opacity="0.5"/>
+        <path d="M10 10Q50 80 100 90" stroke="#059669" stroke-width="3" stroke-linecap="round"/>
     </svg>
 
     <div class="container-wrapper">
         <div class="app-header">
-            <h2 class="app-title">🍃 Luyện Từ Vựng HSK</h2>
+            <h2 class="app-title">🍃 Luyện Từ Vựng HSK <span class="pro-tag">PRO</span></h2>
 
             <div class="owner-badge">
                 <span class="owner-icon">👤</span>
@@ -408,7 +450,7 @@
                         <div class="value" id="statDone">0</div>
                     </div>
                     <div class="stat-card" style="border-color: var(--success-light); background: #f0fdf4;">
-                        <div class="label" style="color: #166534;">Số câu Đúng</div>
+                        <div class="label" style="color: #065f46;">Số câu Đúng</div>
                         <div class="value" style="color: var(--success);" id="statCorrect">0</div>
                     </div>
                     <div class="stat-card" style="border-color: var(--danger-light); background: #fef2f2;">
@@ -417,9 +459,9 @@
                     </div>
                 </div>
 
-                <div style="margin-top: 15px; text-align: center; background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #f1f5f9;">
-                    <div style="font-size: 12px; color: var(--text-muted);">Tỷ lệ chính xác</div>
-                    <div style="font-size: 20px; font-weight: 700; color: #10b981;" id="statRate">0.0%</div>
+                <div class="rate-card">
+                    <div style="font-size: 11px; color: #047857; font-weight: 500;">TỶ LỆ CHÍNH XÁC</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #059669; margin-top: 2px;" id="statRate">0.0%</div>
                 </div>
 
                 <div class="footer-owner">
@@ -452,7 +494,7 @@
             startNewQuiz();
         };
 
-        // BÀI XỬ LÝ NẠP FILE EXCEL THÔNG MINH
+        // XỬ LÝ NẠP FILE EXCEL
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
