@@ -387,8 +387,8 @@
             <div class="control-box">
                 <label class="box-label">🎯 Chế độ</label>
                 <select id="modeSelect">
-                    <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt</option>
                     <option value="pinyin_to_chinese">Gõ Pinyin / Tiếng Trung</option>
+                    <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt</option>
                 </select>
             </div>
 
@@ -626,16 +626,14 @@
                 const tr = document.createElement('tr');
                 tr.id = `row_${index}`;
                 
-                const isMeaningMode = (mode === 'chinese_to_meaning');
+                const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
-                // Nếu Gõ Nghĩa TV -> Hiện Chữ Hán, Ẩn Tiếng Việt
-                // Nếu Gõ Pinyin/Trung -> Ẩn Chữ Hán, Hiện Tiếng Việt
                 tr.innerHTML = `
                     <td class="col-stt">${index + 1}</td>
-                    <td id="chinese_${index}" class="col-hanzi">${isMeaningMode ? item.chinese : '***'}</td>
+                    <td id="chinese_${index}" class="col-hanzi">${isPinyinMode ? '***' : item.chinese}</td>
                     <td class="col-type">${item.type}</td>
                     <td id="pinyin_${index}" class="col-pinyin">***</td>
-                    <td id="meaning_${index}" class="col-viet">${isMeaningMode ? '***' : item.meaning}</td>
+                    <td id="meaning_${index}" class="col-viet">${isPinyinMode ? item.meaning : '***'}</td>
                     <td class="col-input">
                         <input type="text" id="input_${index}" 
                                enterkeyhint="next" 
@@ -716,7 +714,6 @@
                 rowTr.className = 'row-wrong'; 
             }
 
-            // Mở lại toàn bộ đáp án khi người dùng đã nhập xong/rời khỏi ô
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
