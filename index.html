@@ -75,7 +75,7 @@
             padding: 8px 4px; 
             text-align: center; 
             word-wrap: break-word; 
-            transition: background-color 0.3s ease; /* Hiệu ứng chuyển màu mượt */
+            transition: background-color 0.3s ease;
         }
 
         th { 
@@ -99,14 +99,17 @@
             border-radius: 4px; 
             text-align: center; 
             font-size: 14px; 
+            background-color: #ffffff;
         }
         
-        /* === MÀU NỀN TÔ DÒNG KHI ĐÚNG/SAI === */
-        tr.row-correct { 
+        /* === MÀU NỀN CHO ĐIỆN THOẠI (TÔ TRỰC TIẾP VÀO CÁC Ô TD) === */
+        tr.row-correct td { 
             background-color: #d4edda !important; /* Xanh lá nhạt */
+            color: #155724;
         }
-        tr.row-wrong { 
+        tr.row-wrong td { 
             background-color: #f8d7da !important; /* Đỏ nhạt */
+            color: #721c24;
         }
 
         .correct { color: #155724; font-weight: bold; }
@@ -293,7 +296,7 @@
 
             currentQuizData.forEach((item, index) => {
                 const tr = document.createElement('tr');
-                tr.id = `row_${index}`; // Đặt ID cho từng hàng
+                tr.id = `row_${index}`;
                 
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
@@ -358,7 +361,7 @@
             if (inputVal === '') {
                 statusTd.innerText = '-';
                 statusTd.className = 'col-status';
-                rowTr.className = ''; // Bỏ tô màu nếu xóa ô nhập
+                rowTr.className = '';
                 updateStats();
                 return;
             }
@@ -377,18 +380,18 @@
                 }
             }
 
-            // Đổi màu nền của toàn bộ hàng theo kết quả
+            // Gán class tô màu trực tiếp
             if (isCorrect) {
                 statusTd.innerText = '✓ Đúng';
                 statusTd.className = 'col-status correct';
-                rowTr.className = 'row-correct'; // Tô màu xanh nhạt
+                rowTr.className = 'row-correct'; 
             } else {
                 statusTd.innerText = '✗ Sai';
                 statusTd.className = 'col-status wrong';
-                rowTr.className = 'row-wrong'; // Tô màu đỏ nhạt
+                rowTr.className = 'row-wrong'; 
             }
 
-            // Hiện đáp án bị ẩn
+            // Mở hiện thông tin chi tiết
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
