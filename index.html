@@ -350,6 +350,13 @@
                 </select>
             </label>
 
+            <label>Kiểu trộn:
+                <select id="shuffleSelect">
+                    <option value="random">🔀 Đảo ngẫu nhiên</option>
+                    <option value="sequential">🔢 Theo thứ tự</option>
+                </select>
+            </label>
+
             <label>Số câu: 
                 <input type="number" id="quizSize" value="10" min="1" style="width: 45px; text-align: center;">
             </label>
@@ -432,7 +439,6 @@
             } else {
                 fullVocabData = [...EMBEDDED_VOCAB_DATA];
             }
-            // Thiết lập giá trị max ban đầu cho ô 'đến'
             document.getElementById('rangeTo').value = fullVocabData.length;
             startNewQuiz();
         };
@@ -499,7 +505,6 @@
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
                     if (statusText) { statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`; statusText.style.color = "var(--success)"; }
                     
-                    // Cập nhật lại khoảng câu theo tổng số lượng từ mới đọc
                     document.getElementById('rangeFrom').value = 1;
                     document.getElementById('rangeTo').value = fullVocabData.length;
                     
@@ -515,8 +520,8 @@
             let fromIdx = parseInt(document.getElementById('rangeFrom').value) || 1;
             let toIdx = parseInt(document.getElementById('rangeTo').value) || fullVocabData.length;
             const size = parseInt(document.getElementById('quizSize').value) || 10;
+            const shuffleMode = document.getElementById('shuffleSelect').value;
 
-            // Kiểm tra và giới hạn an toàn cho khoảng câu
             if (fromIdx < 1) fromIdx = 1;
             if (toIdx > fullVocabData.length) toIdx = fullVocabData.length;
             if (fromIdx > toIdx) {
@@ -526,7 +531,6 @@
             document.getElementById('rangeFrom').value = fromIdx;
             document.getElementById('rangeTo').value = toIdx;
 
-            // Cắt mảng theo khoảng đã chọn (chuyển về index mảng JS bắt đầu từ 0)
             const slicedData = fullVocabData.slice(fromIdx - 1, toIdx);
 
             if (slicedData.length === 0) {
@@ -534,8 +538,16 @@
                 return;
             }
 
-            const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
-            currentQuizData = shuffled.slice(0, Math.min(size, slicedData.length));
+            let processedData = [];
+            if (shuffleMode === 'random') {
+                const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
+                processedData = shuffled.slice(0, Math.min(size, slicedData.length));
+            } else {
+                // Theo thứ tự
+                processedData = slicedData.slice(0, Math.min(size, slicedData.length));
+            }
+
+            currentQuizData = processedData;
             
             resetTimer(); 
             renderTable();
@@ -684,6 +696,7 @@
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
         document.getElementById('modeSelect').addEventListener('change', startNewQuiz);
+        document.getElementById('shuffleSelect').addEventListener('change', startNewQuiz);
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
