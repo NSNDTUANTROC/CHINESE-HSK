@@ -105,7 +105,6 @@
         .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #db2777; letter-spacing: 0.5px; }
         .owner-badge .owner-class { font-size: 11px; color: #4f46e5; font-weight: 600; }
 
-        /* KHU VỰC ĐIỀU KHIỂN - THIẾT KẾ LẠI ĐẸP MẮT & SANG TRỌNG */
         .controls { 
             display: flex; 
             gap: 12px; 
@@ -180,7 +179,6 @@
             text-align: center;
         }
 
-        /* NÚT BẤM CAO CẤP - HIỆU ỨNG GLOW & 3D */
         .btn { 
             padding: 10px 20px; 
             border: none; 
@@ -608,6 +606,10 @@
             sequentialOffset = 0;
         });
 
+        document.getElementById('modeSelect').addEventListener('change', function() {
+            renderTable();
+        });
+
         function retryCurrentQuiz() { 
             if (currentQuizData.length > 0) {
                 resetTimer();
@@ -623,14 +625,17 @@
             currentQuizData.forEach((item, index) => {
                 const tr = document.createElement('tr');
                 tr.id = `row_${index}`;
-                const isPinyinMode = (mode === 'pinyin_to_chinese');
+                
+                // Nếu chế độ là gõ nghĩa tiếng việt (chinese_to_meaning): hiển thị chữ hán, ẩn pinyin và nghĩa việt
+                // Nếu chế độ là gõ pinyin/trung (pinyin_to_chinese): ẩn chữ hán và pinyin, hiển thị nghĩa việt
+                const isMeaningMode = (mode === 'chinese_to_meaning');
                 
                 tr.innerHTML = `
                     <td class="col-stt">${index + 1}</td>
-                    <td id="chinese_${index}" class="col-hanzi">${isPinyinMode ? '***' : item.chinese}</td>
+                    <td id="chinese_${index}" class="col-hanzi">${isMeaningMode ? item.chinese : '***'}</td>
                     <td class="col-type">${item.type}</td>
                     <td id="pinyin_${index}" class="col-pinyin">***</td>
-                    <td id="meaning_${index}" class="col-viet">${!isPinyinMode ? '***' : item.meaning}</td>
+                    <td id="meaning_${index}" class="col-viet">${isMeaningMode ? '***' : item.meaning}</td>
                     <td class="col-input">
                         <input type="text" id="input_${index}" 
                                enterkeyhint="next" 
