@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK Pro - TRẦN ANH TUẤN</title>
+    <!-- Phông chữ chuẩn -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    
+    <!-- THƯ VIỆN ĐỌC FILE EXCEL (SHEETJS) - BẮT BUỘC CÓ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
     <style>
         :root {
             --primary: #6366f1;
@@ -51,7 +55,6 @@
             margin: 0;
         }
 
-        /* NHÃN THÔNG TIN SỞ HỮU TRANG WEB */
         .owner-badge {
             background: linear-gradient(135deg, #e0e7ff, #f1f5f9);
             border: 1px solid #c7d2fe;
@@ -63,28 +66,10 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.05);
         }
 
-        .owner-badge .owner-icon {
-            font-size: 14px;
-        }
-
-        .owner-badge .owner-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
-        }
-
-        .owner-badge .owner-name {
-            font-weight: 700;
-            font-size: 13px;
-            color: #3730a3;
-            letter-spacing: 0.5px;
-        }
-
-        .owner-badge .owner-class {
-            font-size: 11px;
-            color: #4338ca;
-            font-weight: 500;
-        }
+        .owner-badge .owner-icon { font-size: 14px; }
+        .owner-badge .owner-info { display: flex; flex-direction: column; line-height: 1.2; }
+        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #3730a3; letter-spacing: 0.5px; }
+        .owner-badge .owner-class { font-size: 11px; color: #4338ca; font-weight: 500; }
 
         .controls { 
             display: flex; 
@@ -163,7 +148,6 @@
             table-layout: fixed; 
         }
 
-        /* THANH TIÊU ĐỀ BẢNG */
         th { 
             background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
             color: #ffffff !important;
@@ -187,7 +171,7 @@
             transition: background-color 0.2s ease;
         }
 
-        /* CỘT CHỮ HÁN: Phông nét mảnh thanh thoát, dễ soi từng nét */
+        /* CỘT CHỮ HÁN: Phông nét mảnh thanh thoát */
         td.col-hanzi { 
             font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
             font-size: 21px; 
@@ -196,11 +180,7 @@
             letter-spacing: 1px;
         }
 
-        td.col-pinyin { 
-            color: #475569; 
-            font-style: italic; 
-            font-size: 14px;
-        }
+        td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; }
         td.col-stt { color: var(--text-muted); }
         td.col-type { color: var(--text-muted); font-size: 12px; }
         td.col-viet { font-weight: 500; }
@@ -232,15 +212,8 @@
             box-shadow: 0 0 0 3px var(--primary-light);
         }
         
-        /* MÀU DÒNG ĐÚNG/SAI */
-        tr.row-correct td { 
-            background-color: var(--success-light) !important; 
-            color: #065f46;
-        }
-        tr.row-wrong td { 
-            background-color: var(--danger-light) !important; 
-            color: #991b1b;
-        }
+        tr.row-correct td { background-color: var(--success-light) !important; color: #065f46; }
+        tr.row-wrong td { background-color: var(--danger-light) !important; color: #991b1b; }
 
         /* BẢNG THỐNG KÊ */
         .stats-dashboard { 
@@ -276,11 +249,7 @@
             transition: width 0.4s ease;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
         .stat-card {
             background: #f8fafc;
@@ -426,43 +395,84 @@
             startNewQuiz();
         };
 
+        // BÀI XỬ LÝ NẠP FILE EXCEL THÔNG MINH CẢI TIẾN
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const statusText = document.getElementById('loadingStatus');
-            if (statusText) statusText.innerText = "⏳ Đang nạp...";
+            if (statusText) {
+                statusText.innerText = "⏳ Đang đọc file...";
+                statusText.style.color = "var(--primary)";
+            }
+
+            // Kiểm tra xem thư viện SheetJS đã sẵn sàng chưa
+            if (typeof XLSX === 'undefined') {
+                alert("Lỗi: Thư viện đọc Excel chưa tải xong hoặc bị chặn internet! Vui lòng làm mới lại trang.");
+                if (statusText) statusText.innerText = "❌ Lỗi thư viện";
+                return;
+            }
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary' });
-                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
 
                     if (!json || json.length === 0) {
-                        alert("File Excel trống!");
-                        if (statusText) statusText.innerText = "";
+                        alert("File Excel này không có dữ liệu!");
+                        if (statusText) statusText.innerText = "❌ File rỗng";
                         return;
                     }
 
-                    fullVocabData = json.map(row => ({
-                        chinese: row['CHENESE'] || row['Tiếng Trung'] || row['Chữ Hán'] || row['Word'] || row['Chinese'] || row['CHỮ HÁN'] || '',
-                        type: row['VOCABULARY'] || row['Loại từ'] || row['Type'] || row['LOẠI TỪ'] || '',
-                        pinyin: row['PINYIN'] || row['Pinyin'] || row['Phát âm'] || row['Phien am'] || '',
-                        meaning: row['MEANING'] || row['Tiếng Việt'] || row['Nghĩa'] || row['Meaning'] || row['NGHĨA TIẾNG VIỆT'] || ''
-                    })).filter(item => item.chinese || item.meaning);
+                    // Tự động tìm cột thông minh dù tiêu đề Excel là tiếng Anh/Việt/Hoa
+                    fullVocabData = json.map(row => {
+                        let chinese = '', type = '', pinyin = '', meaning = '';
+
+                        // Duyệt qua từng ô để tìm dữ liệu tương ứng
+                        Object.keys(row).forEach(key => {
+                            const cleanKey = key.toString().trim().toUpperCase();
+                            const val = row[key] ? row[key].toString().trim() : '';
+
+                            if (cleanKey.includes('CHENESE') || cleanKey.includes('CHINESE') || cleanKey.includes('TRUNG') || cleanKey.includes('HÁN') || cleanKey.includes('HANZI') || cleanKey.includes('WORD')) {
+                                if (!chinese) chinese = val;
+                            } else if (cleanKey.includes('PINYIN') || cleanKey.includes('PHÁT ÂM') || cleanKey.includes('PHIÊN ÂM')) {
+                                if (!pinyin) pinyin = val;
+                            } else if (cleanKey.includes('MEANING') || cleanKey.includes('VIỆT') || cleanKey.includes('NGHĨA') || cleanKey.includes('DỊCH')) {
+                                if (!meaning) meaning = val;
+                            } else if (cleanKey.includes('TYPE') || cleanKey.includes('VOCABULARY') || cleanKey.includes('LOẠI')) {
+                                if (!type) type = val;
+                            }
+                        });
+
+                        return { chinese, type, pinyin, meaning };
+                    }).filter(item => item.chinese || item.meaning);
+
+                    if (fullVocabData.length === 0) {
+                        alert("Không tìm thấy các cột từ vựng hợp lệ trong file Excel!");
+                        if (statusText) statusText.innerText = "❌ Lỗi định dạng cột";
+                        return;
+                    }
 
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
-                    if (statusText) statusText.innerText = "✅ Nạp thành công!";
+                    if (statusText) {
+                        statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`;
+                        statusText.style.color = "var(--success)";
+                    }
                     startNewQuiz();
 
                 } catch (err) {
-                    alert("Lỗi đọc file: " + err.message);
-                    if (statusText) statusText.innerText = "❌ Lỗi file";
+                    console.error(err);
+                    alert("Lỗi khi đọc file Excel: " + err.message);
+                    if (statusText) statusText.innerText = "❌ Lỗi đọc file";
                 }
             };
-            reader.readAsBinaryString(file);
+
+            reader.readAsArrayBuffer(file);
         });
 
         function startNewQuiz() {
@@ -587,3 +597,31 @@
                         done++; correct++;
                     } else if (statusTd.innerText.includes('Sai')) {
                         done++; wrong++;
+                    }
+                }
+            });
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statDone').innerText = done;
+            document.getElementById('statCorrect').innerText = correct;
+            document.getElementById('statWrong').innerText = wrong;
+            
+            const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
+            document.getElementById('statRate').innerText = `${rate}%`;
+
+            const progressPercent = total > 0 ? (done / total) * 100 : 0;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+        }
+
+        document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
+        document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
+        document.getElementById('modeSelect').addEventListener('change', renderTable);
+        document.getElementById('btnReset').addEventListener('click', function() {
+            localStorage.removeItem('hsk_vocab_data');
+            fullVocabData = [...EMBEDDED_VOCAB_DATA];
+            startNewQuiz();
+            alert("Đã khôi phục dữ liệu về mặc định!");
+        });
+    </script>
+</body>
+</html>
