@@ -3,114 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luyện Từ Vựng HSK</title>
-    <!-- Font chữ Google Roboto & Noto Sans SC cho chữ Hán đẹp hơn -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@500;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Thư viện SheetJS đọc file Excel -->
+    <title>Luyện Từ Vựng HSK Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
-        /* ================= GIAO DIỆN HIỆN ĐẠI & MÀU SẮC ================= */
         :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
+            --primary: #6366f1;
+            --primary-light: #e0e7ff;
             --success: #10b981;
-            --warning: #f59e0b;
+            --success-light: #d1fae5;
             --danger: #ef4444;
-            --bg-main: #f3f4f6;
+            --danger-light: #fee2e2;
+            --warning: #f59e0b;
+            --bg-body: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #1f2937;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
         }
 
         body { 
-            font-family: 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif; 
+            font-family: 'Inter', sans-serif; 
             margin: 0; 
-            padding: 15px;
-            background-color: var(--bg-main); 
-            color: var(--text-main);
+            padding: 20px;
+            background-color: var(--bg-body); 
+            color: var(--text-dark);
             font-size: 14px; 
             box-sizing: border-box;
         }
-        
-        .header-title {
-            text-align: center;
-            margin: 0 0 15px 0;
-            font-size: 20px;
+
+        /* HEADER & APP CONTAINER */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .app-title {
+            font-size: 22px;
             font-weight: 700;
-            background: linear-gradient(135deg, #4f46e5, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0;
         }
 
         .controls { 
-            margin-bottom: 15px; 
             display: flex; 
             gap: 10px; 
             flex-wrap: wrap; 
             align-items: center; 
             background: var(--card-bg); 
-            padding: 15px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            padding: 12px 16px; 
+            border-radius: 14px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.02);
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
         }
 
         .controls label {
             font-weight: 500;
+            font-size: 13px;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
         }
 
         .controls select, .controls input[type="number"] {
-            padding: 6px 10px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
+            padding: 7px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             outline: none;
-            transition: all 0.2s;
+            font-weight: 500;
+            background: #f8fafc;
         }
 
-        .controls select:focus, .controls input[type="number"]:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
-        }
-        
         .btn { 
-            padding: 8px 14px; 
+            padding: 8px 16px; 
             border: none; 
             border-radius: 8px; 
             cursor: pointer; 
             font-weight: 600; 
             color: white; 
             font-size: 13px; 
-            white-space: nowrap; 
             display: inline-flex;
             align-items: center;
-            gap: 5px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            gap: 6px;
             transition: all 0.2s ease;
         }
 
-        .btn:active {
-            transform: scale(0.96);
-        }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+        .btn:active { transform: translateY(0); }
 
-        .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
-        .btn-purple { background: linear-gradient(135deg, #6366f1, #4f46e5); }
-        .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
-        .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
+        .btn-green { background-color: var(--success); }
+        .btn-purple { background-color: var(--primary); }
+        .btn-orange { background-color: var(--warning); }
+        .btn-red { background-color: var(--danger); }
         
-        .container { 
+        .main-layout { 
             display: flex; 
-            gap: 15px; 
-            flex-wrap: wrap; 
+            gap: 20px; 
+            align-items: flex-start;
         }
 
+        /* BANG DỮ LIỆU */
         .table-container { 
             flex: 1; 
-            min-width: 300px; 
             background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 12px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            border-radius: 14px; 
+            padding: 16px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
             overflow-x: auto; 
         }
         
@@ -121,140 +128,145 @@
             table-layout: fixed; 
         }
 
-        th, td { 
-            border-bottom: 1px solid #e5e7eb; 
-            padding: 10px 6px; 
-            text-align: center; 
-            word-wrap: break-word; 
-            transition: background-color 0.3s ease;
-        }
-
         th { 
-            background-color: #f9fafb; 
-            font-weight: 700;
-            color: #4b5563;
+            background-color: #f8fafc; 
+            font-weight: 600;
+            color: var(--text-muted);
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-top: 1px solid #e5e7eb;
+            padding: 12px 8px;
+            border-bottom: 2px solid #e2e8f0;
         }
 
-        th:first-child { border-top-left-radius: 8px; border-left: 1px solid #e5e7eb; }
-        th:last-child { border-top-right-radius: 8px; border-right: 1px solid #e5e7eb; }
-        td:first-child { border-left: 1px solid #e5e7eb; }
-        td:last-child { border-right: 1px solid #e5e7eb; }
-        
-        /* Cột chữ Hán đẹp hơn */
+        td { 
+            border-bottom: 1px solid #f1f5f9; 
+            padding: 12px 6px; 
+            text-align: center; 
+            word-wrap: break-word; 
+            transition: background-color 0.2s ease;
+        }
+
         .col-hanzi { 
             font-family: 'Noto Sans SC', sans-serif;
             font-size: 18px; 
             font-weight: 700; 
-            color: #111827;
         }
 
-        /* Tỉ lệ các cột */
-        .col-stt { width: 6%; color: #9ca3af; }
-        .col-type { width: 12%; color: #6b7280; font-size: 12px; }
-        .col-pinyin { width: 16%; color: #4b5563; font-style: italic; }
+        .col-stt { width: 6%; color: var(--text-muted); }
+        .col-type { width: 12%; color: var(--text-muted); font-size: 12px; }
+        .col-pinyin { width: 16%; color: #475569; font-style: italic; }
         .col-viet { width: 25%; font-weight: 500; }
         .col-input { width: 18%; }
-        .col-status { width: 8%; }
+        .col-status { width: 8%; font-weight: 700; }
 
         input[type="text"] { 
             width: 85%; 
-            padding: 6px 8px; 
-            border: 1.5px solid #d1d5db; 
-            border-radius: 6px; 
+            padding: 8px 10px; 
+            border: 1.5px solid #cbd5e1; 
+            border-radius: 8px; 
             text-align: center; 
             font-size: 15px; 
-            background-color: #ffffff;
             outline: none;
             transition: all 0.2s;
+            background: #f8fafc;
         }
 
         input[type="text"]:focus {
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+            background: #ffffff;
+            box-shadow: 0 0 0 3px var(--primary-light);
         }
         
-        /* === MÀU NỀN TÔ DÒNG KHI ĐÚNG / SAI === */
+        /* MÀU KHI ĐÚNG/SAI */
         tr.row-correct td { 
-            background-color: #ecfdf5 !important; 
+            background-color: var(--success-light) !important; 
             color: #065f46;
         }
         tr.row-wrong td { 
-            background-color: #fef2f2 !important; 
+            background-color: var(--danger-light) !important; 
             color: #991b1b;
         }
 
-        .correct { color: #10b981; font-weight: 700; }
-        .wrong { color: #ef4444; font-weight: 700; }
-        
-        .stats-card { 
-            width: 200px; 
+        /* CỘT THỐNG KÊ DASHBOARD */
+        .stats-dashboard { 
+            width: 240px; 
             background: var(--card-bg); 
-            border-radius: 12px; 
-            padding: 15px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-            height: fit-content; 
+            border-radius: 14px; 
+            padding: 18px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.02);
+            border: 1px solid #e2e8f0;
         }
 
-        .stats-card h3 { 
+        .stats-dashboard h3 { 
             font-size: 14px; 
-            margin-top: 0; 
-            margin-bottom: 12px; 
+            margin: 0 0 15px 0; 
             text-transform: uppercase;
+            color: var(--text-muted);
             letter-spacing: 0.5px;
-            color: #6b7280;
         }
 
-        .stats-item {
-            display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 13px;
-        }
-        
-        .loading-msg { 
-            font-style: italic; 
-            color: var(--success); 
-            font-weight: 600; 
-            margin-left: 5px; 
-            font-size: 12px; 
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
         }
 
-        @media (max-width: 600px) {
-            body { padding: 8px; }
-            .header-title { font-size: 18px; margin-bottom: 10px; }
-            .controls { padding: 10px; gap: 8px; justify-content: center; }
-            .btn { padding: 6px 10px; font-size: 11px; }
-            .container { flex-direction: column; gap: 10px; }
-            .table-container { padding: 6px; }
-            th, td { padding: 8px 2px; font-size: 12px; }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            transition: width 0.4s ease;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .stat-card .value { font-size: 16px; font-weight: 700; }
+
+        @media (max-width: 768px) {
+            body { padding: 10px; }
+            .main-layout { flex-direction: column; }
+            .stats-dashboard { width: 100%; box-sizing: border-box; }
             .col-stt, .col-type, .col-status { display: none; }
-            .col-hanzi { width: 26%; font-size: 16px; }
+            .col-hanzi { width: 28%; }
             .col-pinyin { width: 22%; }
-            .col-viet { width: 28%; }
+            .col-viet { width: 26%; }
             .col-input { width: 24%; }
-            input[type="text"] { font-size: 16px; padding: 5px 0; width: 95%; }
-            .stats-card { width: auto; margin-top: 5px; }
         }
     </style>
 </head>
 <body>
 
-    <h2 class="header-title">🎓 LUYỆN TỪ VỰNG HSK</h2>
+    <div class="app-header">
+        <h2 class="app-title">⚡ Luyện Từ Vựng HSK</h2>
+        <span id="loadingStatus" style="font-size: 13px; font-weight: 600; color: var(--success);"></span>
+    </div>
 
     <div class="controls">
         <label class="btn btn-green">
-            📁 Chọn File Excel
+            📁 Chọn Excel
             <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
         </label>
         
         <label>Chế độ: 
             <select id="modeSelect">
-                <option value="pinyin_to_chinese">Gõ Pinyin/Tiếng Trung (Từng Tiếng Việt)</option>
-                <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt (Từng Tiếng Trung)</option>
+                <option value="pinyin_to_chinese">Gõ Pinyin/Tiếng Trung</option>
+                <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt</option>
             </select>
         </label>
 
@@ -262,13 +274,12 @@
             <input type="number" id="quizSize" value="10" min="1" style="width: 45px; text-align: center;">
         </label>
 
-        <button class="btn btn-purple" id="btnNewQuiz">🔀 Đổi đề mới</button>
+        <button class="btn btn-purple" id="btnNewQuiz">🔀 Đổi đề</button>
         <button class="btn btn-orange" id="btnRetryQuiz">🔄 Làm lại</button>
-        <button class="btn btn-red" id="btnReset">🗑 Xóa dữ liệu</button>
-        <span id="loadingStatus" class="loading-msg"></span>
+        <button class="btn btn-red" id="btnReset">🗑 Xóa data</button>
     </div>
 
-    <div class="container">
+    <div class="main-layout">
         <div class="table-container">
             <table>
                 <thead>
@@ -278,22 +289,43 @@
                         <th class="col-type">Loại từ</th>
                         <th class="col-pinyin">Pinyin</th>
                         <th class="col-viet">Tiếng Việt</th>
-                        <th class="col-input">Ô nhập</th>
-                        <th class="col-status">Kết quả</th>
+                        <th class="col-input">Ô Nhập</th>
+                        <th class="col-status">Trạng thái</th>
                     </tr>
                 </thead>
                 <tbody id="vocabTable"></tbody>
             </table>
         </div>
 
-        <div class="stats-card">
-            <h3 style="text-align: center;">📊 THỐNG KÊ</h3>
-            <div class="stats-item"><span>Tổng số câu:</span><b id="statTotal">0</b></div>
-            <div class="stats-item"><span>Đã làm:</span><b id="statDone">0</b></div>
-            <div class="stats-item" style="color: #10b981;"><span>Đúng:</span><b id="statCorrect">0</b></div>
-            <div class="stats-item" style="color: #ef4444;"><span>Sai:</span><b id="statWrong">0</b></div>
-            <hr style="border: 0; border-top: 1px dashed #e5e7eb; margin: 8px 0;">
-            <div class="stats-item" style="font-size: 14px;"><span>Tỷ lệ đúng:</span><b id="statRate" style="color: #ef4444;">0.0%</b></div>
+        <div class="stats-dashboard">
+            <h3>📊 Tiến độ bài tập</h3>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="label">Tổng số câu</div>
+                    <div class="value" id="statTotal">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="label">Đã hoàn thành</div>
+                    <div class="value" id="statDone">0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--success-light); background: #f0fdf4;">
+                    <div class="label" style="color: #166534;">Số câu Đúng</div>
+                    <div class="value" style="color: var(--success);" id="statCorrect">0</div>
+                </div>
+                <div class="stat-card" style="border-color: var(--danger-light); background: #fef2f2;">
+                    <div class="label" style="color: #991b1b;">Số câu Sai</div>
+                    <div class="value" style="color: var(--danger);" id="statWrong">0</div>
+                </div>
+            </div>
+
+            <div style="margin-top: 15px; text-align: center; background: #f8fafc; padding: 10px; border-radius: 10px;">
+                <div style="font-size: 12px; color: var(--text-muted);">Tỷ lệ chính xác</div>
+                <div style="font-size: 20px; font-weight: 700; color: var(--primary);" id="statRate">0.0%</div>
+            </div>
         </div>
     </div>
 
@@ -312,11 +344,8 @@
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
             if (savedData) {
-                try {
-                    fullVocabData = JSON.parse(savedData);
-                } catch(e) {
-                    fullVocabData = [...EMBEDDED_VOCAB_DATA];
-                }
+                try { fullVocabData = JSON.parse(savedData); } 
+                catch(e) { fullVocabData = [...EMBEDDED_VOCAB_DATA]; }
             } else {
                 fullVocabData = [...EMBEDDED_VOCAB_DATA];
             }
@@ -335,12 +364,10 @@
                 try {
                     const data = e.target.result;
                     const workbook = XLSX.read(data, { type: 'binary' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const json = XLSX.utils.sheet_to_json(worksheet);
+                    const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
                     if (!json || json.length === 0) {
-                        alert("File Excel trống hoặc không đọc được dữ liệu!");
+                        alert("File Excel trống!");
                         if (statusText) statusText.innerText = "";
                         return;
                     }
@@ -353,9 +380,8 @@
                     })).filter(item => item.chinese || item.meaning);
 
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
-                    if (statusText) statusText.innerText = "✅ Đã nạp xong!";
+                    if (statusText) statusText.innerText = "✅ Nạp thành công!";
                     startNewQuiz();
-                    alert("Thành công! Đã nạp " + fullVocabData.length + " từ vựng.");
 
                 } catch (err) {
                     alert("Lỗi đọc file: " + err.message);
@@ -366,9 +392,7 @@
         });
 
         function startNewQuiz() {
-            if (!fullVocabData || fullVocabData.length === 0) {
-                fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            }
+            if (!fullVocabData || fullVocabData.length === 0) fullVocabData = [...EMBEDDED_VOCAB_DATA];
             const size = parseInt(document.getElementById('quizSize').value) || 10;
             const shuffled = [...fullVocabData].sort(() => 0.5 - Math.random());
             currentQuizData = shuffled.slice(0, Math.min(size, fullVocabData.length));
@@ -391,16 +415,12 @@
                 
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
-                const chineseDisplay = isPinyinMode ? '***' : item.chinese;
-                const pinyinDisplay = '***';
-                const meaningDisplay = !isPinyinMode ? '***' : item.meaning;
-
                 tr.innerHTML = `
                     <td class="col-stt">${index + 1}</td>
-                    <td id="chinese_${index}" class="col-hanzi">${chineseDisplay}</td>
+                    <td id="chinese_${index}" class="col-hanzi">${isPinyinMode ? '***' : item.chinese}</td>
                     <td class="col-type">${item.type}</td>
-                    <td id="pinyin_${index}" class="col-pinyin">${pinyinDisplay}</td>
-                    <td id="meaning_${index}" class="col-viet">${meaningDisplay}</td>
+                    <td id="pinyin_${index}" class="col-pinyin">***</td>
+                    <td id="meaning_${index}" class="col-viet">${!isPinyinMode ? '***' : item.meaning}</td>
                     <td class="col-input">
                         <input type="text" id="input_${index}" 
                                enterkeyhint="next" 
@@ -416,9 +436,7 @@
         }
 
         function handleCompositionEnd(index) {
-            setTimeout(() => {
-                moveToNext(index);
-            }, 80);
+            setTimeout(() => { moveToNext(index); }, 80);
         }
 
         function moveToNext(index) {
@@ -461,23 +479,19 @@
             if (mode === 'pinyin_to_chinese') {
                 const targetPinyin = (item.pinyin || '').toLowerCase();
                 const targetChinese = (item.chinese || '').toLowerCase();
-                if (inputVal === targetPinyin || inputVal === targetChinese) {
-                    isCorrect = true;
-                }
+                if (inputVal === targetPinyin || inputVal === targetChinese) isCorrect = true;
             } else {
                 const targetMeaning = (item.meaning || '').toLowerCase();
-                if (targetMeaning.includes(inputVal) && inputVal.length >= 1) {
-                    isCorrect = true;
-                }
+                if (targetMeaning.includes(inputVal) && inputVal.length >= 1) isCorrect = true;
             }
 
             if (isCorrect) {
                 statusTd.innerText = '✓ Đúng';
-                statusTd.className = 'col-status correct';
+                statusTd.style.color = 'var(--success)';
                 rowTr.className = 'row-correct'; 
             } else {
                 statusTd.innerText = '✗ Sai';
-                statusTd.className = 'col-status wrong';
+                statusTd.style.color = 'var(--danger)';
                 rowTr.className = 'row-wrong'; 
             }
 
@@ -495,12 +509,10 @@
             currentQuizData.forEach((_, index) => {
                 const statusTd = document.getElementById(`status_${index}`);
                 if (statusTd) {
-                    if (statusTd.classList.contains('correct')) {
-                        done++;
-                        correct++;
-                    } else if (statusTd.classList.contains('wrong')) {
-                        done++;
-                        wrong++;
+                    if (statusTd.innerText.includes('Đúng')) {
+                        done++; correct++;
+                    } else if (statusTd.innerText.includes('Sai')) {
+                        done++; wrong++;
                     }
                 }
             });
@@ -512,6 +524,10 @@
             
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
             document.getElementById('statRate').innerText = `${rate}%`;
+
+            // Cập nhật thanh tiến độ (Progress bar)
+            const progressPercent = total > 0 ? (done / total) * 100 : 0;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
         }
 
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
@@ -520,10 +536,8 @@
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            const statusText = document.getElementById('loadingStatus');
-            if (statusText) statusText.innerText = "";
             startNewQuiz();
-            alert("Đã xóa dữ liệu tạm và khôi phục về mặc định!");
+            alert("Đã khôi phục dữ liệu về mặc định!");
         });
     </script>
 </body>
