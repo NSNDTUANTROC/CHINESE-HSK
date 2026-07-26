@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK Pro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Nhập phông Noto Serif SC (chữ Khải/Thư pháp rõ nét) & Noto Sans SC -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -22,7 +23,7 @@
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             margin: 0; 
             padding: 20px;
             background-color: var(--bg-body); 
@@ -43,7 +44,7 @@
 
         .app-title {
             font-size: 22px;
-            font-weight: 700;
+            font-weight: 600;
             color: var(--text-dark);
             display: flex;
             align-items: center;
@@ -128,16 +129,16 @@
             table-layout: fixed; 
         }
 
-        /* TÔ MÀU VÀ ĐỒNG BỘ CHỮ CHO THANH TIÊU ĐỀ (TH) */
+        /* THANH TIÊU ĐỀ TH: MẮT NHÌN DỄ CHỊU, CHỮ KHÔNG TÔ ĐẬM LỆCH */
         th { 
-            background: linear-gradient(135deg, #4f46e5, #6366f1) !important; /* Tô màu tím nổi bật */
-            color: #ffffff !important; /* Chữ trắng rõ ràng */
-            font-weight: 700 !important;
+            background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+            color: #ffffff !important;
+            font-weight: 500 !important; /* Độ dày vừa phải, không bị thô */
             font-size: 13px !important;
             font-style: normal !important;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            padding: 14px 8px !important;
+            padding: 12px 8px !important;
             border: none !important;
         }
 
@@ -153,20 +154,24 @@
             transition: background-color 0.2s ease;
         }
 
-        /* Kiểu dáng chữ cho các CỘT NỘI DUNG (TD) */
+        /* CỘT CHỮ HÁN: Phông nét mảnh thanh thoát, dễ soi từng nét */
         td.col-hanzi { 
-            font-family: 'Noto Sans SC', sans-serif;
-            font-size: 18px; 
-            font-weight: 700; 
+            font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
+            font-size: 21px; 
+            font-weight: 400 !important; /* KHÔNG TÔ ĐẬM giúp các nét tách biệt rõ ràng */
+            color: #1e293b;
+            letter-spacing: 1px;
         }
+
         td.col-pinyin { 
             color: #475569; 
             font-style: italic; 
+            font-size: 14px;
         }
         td.col-stt { color: var(--text-muted); }
         td.col-type { color: var(--text-muted); font-size: 12px; }
         td.col-viet { font-weight: 500; }
-        td.col-status { font-weight: 700; }
+        td.col-status { font-weight: 600; }
 
         .col-stt { width: 6%; }
         .col-hanzi { width: 18%; }
@@ -253,7 +258,7 @@
         }
 
         .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-        .stat-card .value { font-size: 16px; font-weight: 700; }
+        .stat-card .value { font-size: 16px; font-weight: 600; }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
