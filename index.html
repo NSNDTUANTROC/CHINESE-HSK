@@ -444,6 +444,12 @@
                 fullVocabData = [...EMBEDDED_VOCAB_DATA];
             }
             document.getElementById('rangeTo').value = fullVocabData.length;
+            
+            // Gán sự kiện click cho các nút điều khiển
+            document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
+            document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
+            document.getElementById('btnReset').addEventListener('click', resetAllData);
+
             startNewQuiz();
         };
 
@@ -476,7 +482,7 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // ĐỌC THÔNG MINH CẠO SẠCH TIÊU ĐỀ KỂ CẢ SAI CHÍNH TẢ NHƯ CHENESE VÀ VOCABULARY
+        // ĐỌC FILE EXCEL
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -497,7 +503,6 @@
                         return;
                     }
 
-                    // Tìm dòng tiêu đề
                     let headerRowIndex = 0;
                     for (let i = 0; i < Math.min(rows.length, 5); i++) {
                         const rowStr = rows[i].join(" ").toUpperCase();
@@ -508,39 +513,22 @@
                     }
 
                     const headers = rows[headerRowIndex].map(h => h.toString().trim().toUpperCase());
-                    
                     let colChinese = -1, colType = -1, colPinyin = -1, colMeaning = -1;
 
                     headers.forEach((h, idx) => {
-                        // Tránh ăn nhầm vào các cột INPUT CHENESE
                         if (h.includes('INPUT')) return;
-
-                        if ((h.includes('CHENESE') || h.includes('CHINESE') || h.includes('HÁN') || h.includes('KANJI')) && colChinese === -1) {
-                            colChinese = idx;
-                        }
-                        else if (h.includes('VOCABULARY') || h.includes('TYPE') || h.includes('LOẠI TỪ') || h.includes('TỪ LOẠI')) {
-                            colType = idx;
-                        }
-                        else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM')) {
-                            colPinyin = idx;
-                        }
-                        else if (h.includes('MEANING') || h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA')) {
-                            colMeaning = idx;
-                        }
+                        if ((h.includes('CHENESE') || h.includes('CHINESE') || h.includes('HÁN') || h.includes('KANJI')) && colChinese === -1) colChinese = idx;
+                        else if (h.includes('VOCABULARY') || h.includes('TYPE') || h.includes('LOẠI TỪ') || h.includes('TỪ LOẠI')) colType = idx;
+                        else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM')) colPinyin = idx;
+                        else if (h.includes('MEANING') || h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA')) colMeaning = idx;
                     });
 
-                    // Nếu không nhận diện được tiêu đề, áp dụng chính xác vị trí theo ảnh Excel của bạn:
-                    // Cột 1 (Index 1): CHENESE -> Chữ Hán
-                    // Cột 2 (Index 2): VOCABULARY -> Loại từ
-                    // Cột 3 (Index 3): PINYIN -> Phiên âm
-                    // Cột 4 (Index 4): MEANING -> Nghĩa
                     if (colChinese === -1) colChinese = 1;
                     if (colType === -1) colType = 2;
                     if (colPinyin === -1) colPinyin = 3;
                     if (colMeaning === -1) colMeaning = 4;
 
                     const parsedData = [];
-
                     for (let i = headerRowIndex + 1; i < rows.length; i++) {
                         const row = rows[i];
                         if (!row || row.length === 0) continue;
@@ -623,6 +611,18 @@
                 resetTimer();
                 renderTable();
             } 
+        }
+
+        function resetAllData() {
+            if (confirm("Bạn có chắc chắn muốn xóa dữ liệu đã lưu?")) {
+                localStorage.removeItem('hsk_vocab_data');
+                fullVocabData = [...EMBEDDED_VOCAB_DATA];
+                document.getElementById('loadingStatus').innerText = "";
+                document.getElementById('rangeFrom').value = 1;
+                document.getElementById('rangeTo').value = fullVocabData.length;
+                sequentialOffset = 0;
+                startNewQuiz();
+            }
         }
 
         function renderTable() {
@@ -746,26 +746,17 @@
             document.getElementById('statDone').innerText = done;
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
-            
-            const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
+
+            const rate = done > 0 ? ((correct / done) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
-            document.getElementById('progressBar').style.width = `${total > 0 ? (done / total) * 100 : 0}%`;
 
-            if (done === total && total > 0) stopTimer();
+            const progressPercent = total > 0 ? (done / total) * 100 : 0;
+            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+
+            if (done === total && total > 0) {
+                stopTimer();
+            }
         }
-
-        document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
-        document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
-        
-        document.getElementById('btnReset').addEventListener('click', function() {
-            localStorage.removeItem('hsk_vocab_data');
-            fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            document.getElementById('rangeFrom').value = 1;
-            document.getElementById('rangeTo').value = fullVocabData.length;
-            sequentialOffset = 0;
-            startNewQuiz();
-            alert("Đã xóa bộ nhớ đệm thành công!");
-        });
     </script>
 </body>
 </html>
