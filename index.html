@@ -225,8 +225,8 @@
         .col-hanzi { width: 18%; }
         .col-type { width: 12%; }
         .col-pinyin { width: 16%; }
-        .col-viet { width: 25%; }
-        .col-input { width: 18%; }
+        .col-viet { width: 23%; }
+        .col-input { width: 17%; }
         .col-status { width: 8%; }
 
         input[type="text"] { 
@@ -316,12 +316,29 @@
 
         .footer-owner { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; font-weight: 500; }
 
+        /* ĐIỀU CHỈNH GIAO DIỆN TRÊN ĐIỆN THOẠI ĐỂ HIỂN THỊ ĐỦ CÁC CỘT */
         @media (max-width: 768px) {
-            body { padding: 10px; }
+            body { padding: 8px; }
             .main-layout { flex-direction: column; }
+            .table-container { padding: 6px; }
             .stats-dashboard { width: 100%; box-sizing: border-box; }
-            .col-stt, .col-type, .col-status { display: none; }
-            .col-hanzi { width: 28%; } .col-pinyin { width: 22%; } .col-viet { width: 26%; } .col-input { width: 24%; }
+            
+            /* Tối ưu kích thước chữ và khoảng cách trên màn hình nhỏ */
+            th { font-size: 10px !important; padding: 8px 2px !important; }
+            td { padding: 8px 2px !important; font-size: 11px; }
+            td.col-hanzi { font-size: 18px; }
+            td.col-pinyin { font-size: 11px; }
+            td.col-type { font-size: 10px; }
+            input[type="text"] { font-size: 12px; padding: 4px 2px; width: 95%; }
+
+            /* Phân bổ tỷ lệ các cột trên điện thoại */
+            .col-stt { width: 7%; }
+            .col-hanzi { width: 20%; }
+            .col-type { width: 13%; }
+            .col-pinyin { width: 17%; }
+            .col-viet { width: 21%; }
+            .col-input { width: 15%; }
+            .col-status { width: 7%; }
         }
     </style>
 </head>
