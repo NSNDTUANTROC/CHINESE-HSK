@@ -440,8 +440,8 @@
             if (savedData) {
                 try { 
                     fullVocabData = JSON.parse(savedData);
-                    // Kiểm tra nếu data cũ bị lỗi không có từ Hán thì dùng lại mẫu
-                    if(fullVocabData.length > 0 && !fullVocabData[0].chinese) {
+                    // Bắt buộc dữ liệu lưu phải chuẩn thuộc tính chinese
+                    if(!fullVocabData || fullVocabData.length === 0 || !fullVocabData[0].chinese) {
                         fullVocabData = [...EMBEDDED_VOCAB_DATA];
                     }
                 } catch(e) { fullVocabData = [...EMBEDDED_VOCAB_DATA]; }
@@ -481,7 +481,7 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // ĐỌC VÀ MAP CỘT EXCEL SIÊU THÔNG MINH
+        // ĐỌC VÀ MAPPING EXCEL CHUẨN XÁC NGUYÊN BẢN CỘT
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -495,35 +495,70 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const json = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+                    
+                    // Chuyển dạng mảng 2 chiều không lấy header mặc định để tự quản lý vị trí
+                    const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
-                    if (!json || json.length === 0) return;
+                    if (!rows || rows.length < 2) {
+                        alert("File Excel không có dữ liệu hoặc sai cấu trúc!");
+                        return;
+                    }
 
-                    fullVocabData = json.map(row => {
-                        let chinese = '', type = '', pinyin = '', meaning = '';
-                        const keys = Object.keys(row);
-                        
-                        keys.forEach(key => {
-                            const k = key.toString().trim().toUpperCase();
-                            const val = row[key] ? row[key].toString().trim() : '';
-                            
-                            // Dò tìm tên cột linh hoạt tối đa
-                            if (k.includes('CHINESE') || k.includes('TRUNG') || k.includes('HÁN') || k.includes('TỪ VỰNG') || k.includes('VOCAB')) chinese = val;
-                            else if (k.includes('PINYIN') || k.includes('PHÁT ÂM') || k.includes('PHIÊN ÂM') || k.includes('ÂM')) pinyin = val;
-                            else if (k.includes('MEANING') || k.includes('VIỆT') || k.includes('NGHĨA') || k.includes('DỊCH')) meaning = val;
-                            else if (k.includes('TYPE') || k.includes('LOẠI') || k.includes('TỪ LOẠI')) type = val;
-                        });
+                    // Tự nhận diện dòng Tiêu đề (Header)
+                    let headerRowIndex = 0;
+                    for (let i = 0; i < Math.min(rows.length, 5); i++) {
+                        const rowStr = rows[i].join(" ").toUpperCase();
+                        if (rowStr.includes("HÁN") || rowStr.includes("CHINESE") || rowStr.includes("PINYIN") || rowStr.includes("VIỆT") || rowStr.includes("NGHĨA")) {
+                            headerRowIndex = i;
+                            break;
+                        }
+                    }
 
-                        // Fallback: Nếu không tìm thấy theo tên cột, map theo thứ tự vị trí cột
-                        if(!chinese && keys[0]) chinese = row[keys[0]] ? row[keys[0]].toString().trim() : '';
-                        if(!pinyin && keys[1]) pinyin = row[keys[1]] ? row[keys[1]].toString().trim() : '';
-                        if(!meaning && keys[2]) meaning = row[keys[2]] ? row[keys[2]].toString().trim() : '';
+                    const headers = rows[headerRowIndex].map(h => h.toString().trim().toUpperCase());
+                    
+                    let colChinese = -1, colType = -1, colPinyin = -1, colMeaning = -1;
 
-                        return { chinese, type, pinyin, meaning };
-                    }).filter(item => item.chinese || item.meaning);
+                    headers.forEach((h, idx) => {
+                        if (h.includes('CHỮ HÁN') || h.includes('HÁN') || h.includes('CHINESE') || h.includes('KANJI') || h.includes('TỪ VỰNG')) colChinese = idx;
+                        else if (h.includes('LOẠI TỪ') || h.includes('LOẠI') || h.includes('TYPE') || h.includes('TỪ LOẠI')) colType = idx;
+                        else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM') || h.includes('PHÁT ÂM')) colPinyin = idx;
+                        else if (h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA') || h.includes('MEANING')) colMeaning = idx;
+                    });
 
+                    // Nếu không dò thấy tên cột thì mặc định gán chuẩn theo thứ tự Excel thông dụng: [0: Hán, 1: Loại từ, 2: Pinyin, 3: Tiếng Việt]
+                    if (colChinese === -1) colChinese = 0;
+                    if (colType === -1) colType = 1;
+                    if (colPinyin === -1) colPinyin = 2;
+                    if (colMeaning === -1) colMeaning = 3;
+
+                    const parsedData = [];
+
+                    for (let i = headerRowIndex + 1; i < rows.length; i++) {
+                        const row = rows[i];
+                        if (!row || row.length === 0) continue;
+
+                        const chinese = row[colChinese] ? row[colChinese].toString().trim() : '';
+                        const type    = row[colType]    ? row[colType].toString().trim() : '';
+                        const pinyin  = row[colPinyin]  ? row[colPinyin].toString().trim() : '';
+                        const meaning = row[colMeaning] ? row[colMeaning].toString().trim() : '';
+
+                        if (chinese || meaning) {
+                            parsedData.push({ chinese, type, pinyin, meaning });
+                        }
+                    }
+
+                    if (parsedData.length === 0) {
+                        alert("Không tìm thấy dữ liệu phù hợp trong file Excel!");
+                        return;
+                    }
+
+                    fullVocabData = parsedData;
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
-                    if (statusText) { statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`; statusText.style.color = "var(--success)"; }
+                    
+                    if (statusText) { 
+                        statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`; 
+                        statusText.style.color = "var(--success)"; 
+                    }
                     
                     document.getElementById('rangeFrom').value = 1;
                     document.getElementById('rangeTo').value = fullVocabData.length;
@@ -582,7 +617,6 @@
             } 
         }
 
-        // HÀM HIỂN THỊ ĐƯỢC CHUẨN HÓA LOGIC 100%
         function renderTable() {
             const tbody = document.getElementById('vocabTable');
             const mode = document.getElementById('modeSelect').value;
@@ -594,9 +628,8 @@
                 
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
-                // Logic hiển thị chuẩn:
-                // pinyin_to_chinese: Che Chữ Hán & Pinyin, Hiện Tiếng Việt.
-                // chinese_to_meaning: Hiện Chữ Hán & Pinyin, Che Tiếng Việt.
+                // Chế độ gõ Pinyin/Tiếng Trung -> Giấu Hán & Pinyin, Hiện Việt
+                // Chế độ gõ Tiếng Việt -> Hiện Hán & Pinyin, Giấu Việt
                 const displayChinese = isPinyinMode ? '***' : (item.chinese || '---');
                 const displayPinyin  = isPinyinMode ? '***' : (item.pinyin || '---');
                 const displayMeaning = isPinyinMode ? (item.meaning || '---') : '***';
@@ -683,7 +716,7 @@
                 rowTr.className = 'row-wrong'; 
             }
 
-            // Hiện đáp án đầy đủ khi đã gõ xong
+            // Hiện lại đáp án khi hoàn tất câu
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
