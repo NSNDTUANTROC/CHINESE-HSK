@@ -221,6 +221,7 @@
         td.col-viet { font-weight: 600; color: #1e293b; }
         td.col-status { font-weight: 700; }
 
+        /* Tỷ lệ cột chuẩn đầy đủ trên máy tính */
         .col-stt { width: 6%; }
         .col-hanzi { width: 18%; }
         .col-type { width: 12%; }
@@ -316,29 +317,31 @@
 
         .footer-owner { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; font-weight: 500; }
 
-        /* ĐIỀU CHỈNH GIAO DIỆN TRÊN ĐIỆN THOẠI ĐỂ HIỂN THỊ ĐỦ CÁC CỘT */
+        /* CHỈ CẤU HÌNH ẨN CỘT TRẠNG THÁI KHI Ở TRÊN ĐIỆN THOẠI */
         @media (max-width: 768px) {
             body { padding: 8px; }
             .main-layout { flex-direction: column; }
             .table-container { padding: 6px; }
             .stats-dashboard { width: 100%; box-sizing: border-box; }
             
-            /* Tối ưu kích thước chữ và khoảng cách trên màn hình nhỏ */
-            th { font-size: 10px !important; padding: 8px 2px !important; }
-            td { padding: 8px 2px !important; font-size: 11px; }
-            td.col-hanzi { font-size: 18px; }
-            td.col-pinyin { font-size: 11px; }
-            td.col-type { font-size: 10px; }
-            input[type="text"] { font-size: 12px; padding: 4px 2px; width: 95%; }
+            /* Ẩn duy nhất cột Trạng thái trên điện thoại */
+            .col-status { display: none !important; }
 
-            /* Phân bổ tỷ lệ các cột trên điện thoại */
-            .col-stt { width: 7%; }
-            .col-hanzi { width: 20%; }
-            .col-type { width: 13%; }
-            .col-pinyin { width: 17%; }
-            .col-viet { width: 21%; }
-            .col-input { width: 15%; }
-            .col-status { width: 7%; }
+            th { font-size: 11px !important; padding: 10px 2px !important; }
+            td { padding: 10px 2px !important; font-size: 13px; }
+            td.col-hanzi { font-size: 22px; }
+            td.col-pinyin { font-size: 13px; }
+            td.col-type { font-size: 11px; }
+            td.col-viet { font-size: 13px; }
+            input[type="text"] { font-size: 14px; padding: 6px 4px; width: 95%; }
+
+            /* Phân bổ tỷ lệ cho 6 cột còn lại trên điện thoại */
+            .col-stt { width: 8%; }
+            .col-hanzi { width: 23%; }
+            .col-type { width: 14%; }
+            .col-pinyin { width: 19%; }
+            .col-viet { width: 22%; }
+            .col-input { width: 14%; }
         }
     </style>
 </head>
