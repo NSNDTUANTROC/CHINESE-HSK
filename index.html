@@ -326,11 +326,7 @@
             margin-top: 4px;
             word-break: break-all;
         }
-        .contact-card .contact-item a {
-            color: #2563eb;
-            text-decoration: none;
-            font-weight: 600;
-        }
+        .contact-card .contact-item a { color: #2563eb; text-decoration: none; font-weight: 600; }
         .contact-card .contact-item a:hover { text-decoration: underline; }
 
         .footer-owner { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; font-weight: 500; }
@@ -347,7 +343,7 @@
 <body>
 
     <script>
-        // Tăng mật độ trang trí: Bổ sung cả Hoa rơi + Bông tuyết
+        // Hiệu ứng hoa rơi & bông tuyết
         const symbols = ['🌸', '🌺', '🌷', '🌻', '🍃', '❄️', '❅', '✨', '💮', '❄️'];
         for (let i = 0; i < 45; i++) {
             const div = document.createElement('div');
@@ -452,7 +448,6 @@
                     <div style="font-size: 22px; font-weight: 700; color: #db2777; margin-top: 2px;" id="statRate">0.0%</div>
                 </div>
 
-                <!-- KHỐI HỖ TRỢ & GÓP Ý CHUYÊN NGHIỆP -->
                 <div class="contact-card">
                     <div class="contact-title">💬 Trung tâm Hỗ trợ & Góp ý</div>
                     <div class="contact-item">
@@ -533,13 +528,13 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // ĐỌC FILE EXCEL
+        // ĐỌC FILE EXCEL & KIỂM TRA MÃ BẢN QUYỀN MỚI CỦA BẠN
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
             const statusText = document.getElementById('loadingStatus');
-            if (statusText) { statusText.innerText = "⏳ Đang đọc file..."; statusText.style.color = "var(--primary)"; }
+            if (statusText) { statusText.innerText = "⏳ Đang xác minh bản quyền file..."; statusText.style.color = "var(--primary)"; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -547,6 +542,21 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+                    // 1. KIỂM TRA CHỮ KÝ BẢN QUYỀN TẠI Ô Z1
+                    const secretCell = worksheet['Z1'] ? worksheet['Z1'].v.toString().trim() : '';
+                    const MY_SECRET_TOKEN = "CAMTU2019S2THANHAN2025"; // MÃ KHÓA CỦA BẠN
+
+                    if (secretCell !== MY_SECRET_TOKEN) {
+                        alert("❌ KHÔNG THỂ MỞ FILE!\nFile Excel này không có Chữ Ký Bản Quyền chính chủ của TRẦN ANH TUẤN hoặc đã bị tạo trái phép.\n\nVui lòng liên hệ Admin để tải file bài tập chuẩn!");
+                        if (statusText) {
+                            statusText.innerText = "❌ File không đúng bản quyền!";
+                            statusText.style.color = "var(--danger)";
+                        }
+                        return; // Từ chối nạp dữ liệu
+                    }
+
+                    // 2. ĐỌC DỮ LIỆU TỪ VỰNG NẾU KHÓA ĐÚNG
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
                     if (!rows || rows.length < 2) {
@@ -687,7 +697,7 @@
                 
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
-                // Ở chế độ "Gõ Nghĩa Tiếng Việt", ẩn Pinyin (***) để tăng độ khó
+                // Ở chế độ "Gõ Nghĩa Tiếng Việt", ẩn cả Pinyin (***)
                 const displayChinese = isPinyinMode ? '***' : (item.chinese || '---');
                 const displayPinyin  = isPinyinMode ? '***' : '***'; 
                 const displayMeaning = isPinyinMode ? (item.meaning || '---') : '***';
@@ -774,7 +784,7 @@
                 rowTr.className = 'row-wrong'; 
             }
 
-            // Hiện đầy đủ Chữ Hán, Pinyin, Tiếng Việt sau khi làm xong câu đó
+            // Hiện kết quả đầy đủ
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
