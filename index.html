@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Luyện Từ Vựng HSK Pro - TRẦN ANH TUẤN</title>
+    <title>HSK Vocabulary Master - Hệ Thống Luyện Từ Vựng HSK</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
@@ -74,30 +74,14 @@
         }
 
         .app-title .pro-tag {
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            background: linear-gradient(135deg, #4f46e5, #8b5cf6);
             color: white;
             font-size: 11px;
             padding: 4px 10px;
             border-radius: 12px;
             vertical-align: middle;
-            box-shadow: 0 2px 5px rgba(236, 72, 153, 0.4);
+            box-shadow: 0 2px 5px rgba(79, 70, 229, 0.3);
         }
-
-        .owner-badge {
-            background: rgba(255, 255, 255, 0.92);
-            border: 2px solid #f472b6;
-            padding: 6px 16px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.2);
-            backdrop-filter: blur(8px);
-        }
-
-        .owner-badge .owner-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #db2777; letter-spacing: 0.5px; }
-        .owner-badge .owner-class { font-size: 11px; color: #4f46e5; font-weight: 600; }
 
         .controls { 
             display: flex; 
@@ -223,7 +207,6 @@
 
         td { border-bottom: 1px solid rgba(203, 213, 225, 0.6); padding: 12px 6px; text-align: center; word-wrap: break-word; }
 
-        /* FONT HIỆN ĐẠI CHUẨN NOTO SANS SC */
         td.col-hanzi { 
             font-family: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
             font-size: 28px; 
@@ -360,14 +343,7 @@
 
     <div class="container-wrapper">
         <div class="app-header">
-            <h2 class="app-title">🌸 Luyện Từ Vựng HSK <span class="pro-tag">PRO VIP</span> 🌺</h2>
-            <div class="owner-badge">
-                <span>👑</span>
-                <div class="owner-info">
-                    <span class="owner-name">TRẦN ANH TUẤN</span>
-                    <span class="owner-class">C7 CB K139-140</span>
-                </div>
-            </div>
+            <h2 class="app-title">🌸 HSK Vocabulary Master <span class="pro-tag">PRO</span></h2>
         </div>
 
         <div class="controls">
@@ -379,7 +355,6 @@
             <div class="control-box">
                 <label class="box-label">🎯 Chế độ</label>
                 <select id="modeSelect">
-                    <option value="pinyin_show_chinese">Gõ Pinyin (Hiện sẵn Chữ Hán)</option>
                     <option value="pinyin_to_chinese">Gõ Chữ Hán / Pinyin (Hiện Tiếng Việt)</option>
                     <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt (Hiện sẵn Chữ Hán)</option>
                 </select>
@@ -480,6 +455,15 @@
         let isTimerRunning = false;
         let sequentialOffset = 0;
 
+        function removePinyinTones(str) {
+            if (!str) return '';
+            return str.normalize('NFD')
+                      .replace(/[\u0300-\u036f]/g, '')
+                      .replace(/ü/g, 'v')
+                      .replace(/Ü/g, 'v')
+                      .toLowerCase();
+        }
+
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
             if (savedData) {
@@ -548,7 +532,7 @@
                     const MY_SECRET_TOKEN = "CAMTU2019S2THANHAN2025"; 
 
                     if (secretCell !== MY_SECRET_TOKEN) {
-                        alert("❌ KHÔNG THỂ MỞ FILE!\nFile Excel này không có Chữ Ký Bản Quyền chính chủ của TRẦN ANH TUẤN hoặc đã bị tạo trái phép.\n\nVui lòng liên hệ Admin để tải file bài tập chuẩn!");
+                        alert("❌ KHÔNG THỂ MỞ FILE!\nFile Excel này không có Chữ Ký Bản Quyền hợp lệ.\n\nVui lòng liên hệ Admin để nhận file bài tập chuẩn!");
                         if (statusText) {
                             statusText.innerText = "❌ File không đúng bản quyền!";
                             statusText.style.color = "var(--danger)";
@@ -698,10 +682,7 @@
                 let displayPinyin  = '***';
                 let displayMeaning = '***';
 
-                if (mode === 'pinyin_show_chinese') {
-                    displayChinese = item.chinese || '---';
-                    displayMeaning = item.meaning || '---';
-                } else if (mode === 'chinese_to_meaning') {
+                if (mode === 'chinese_to_meaning') {
                     displayChinese = item.chinese || '---';
                 } else {
                     displayMeaning = item.meaning || '---';
@@ -748,12 +729,12 @@
             const inputEl = document.getElementById(`input_${index}`);
             if (!inputEl) return;
             
-            const inputVal = inputEl.value.trim().toLowerCase();
+            const rawInput = inputEl.value.trim().toLowerCase();
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
             const rowTr = document.getElementById(`row_${index}`);
 
-            if (inputVal === '') return;
+            if (rawInput === '') return;
 
             let isCorrect = false;
 
@@ -765,20 +746,21 @@
                            .filter(s => s.length > 0);
             };
 
-            if (mode === 'pinyin_show_chinese') {
-                const pinyinOptions = splitOptions(item.pinyin);
-                isCorrect = pinyinOptions.includes(inputVal);
-            } else if (mode === 'pinyin_to_chinese') {
-                const pinyinOptions = splitOptions(item.pinyin);
+            if (mode === 'pinyin_to_chinese') {
                 const chineseOptions = splitOptions(item.chinese);
+                const rawPinyinOptions = splitOptions(item.pinyin);
+                const noTonePinyinOptions = rawPinyinOptions.map(p => removePinyinTones(p));
+                const cleanInputNoTone = removePinyinTones(rawInput);
 
-                if (pinyinOptions.includes(inputVal) || chineseOptions.includes(inputVal)) {
+                if (chineseOptions.includes(rawInput) || 
+                    rawPinyinOptions.includes(rawInput) || 
+                    noTonePinyinOptions.includes(cleanInputNoTone)) {
                     isCorrect = true;
                 }
             } else {
                 const meaningOptions = splitOptions(item.meaning);
                 isCorrect = meaningOptions.some(option => 
-                    option === inputVal || (inputVal.length >= 2 && option.includes(inputVal))
+                    option === rawInput || (rawInput.length >= 2 && option.includes(rawInput))
                 );
             }
 
