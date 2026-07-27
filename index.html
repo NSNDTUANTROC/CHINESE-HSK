@@ -421,11 +421,7 @@
 
     <script>
         const EMBEDDED_VOCAB_DATA = [
-            {"chinese": "工人", "type": "Danh từ", "pinyin": "gōngrén", "meaning": "Công nhân"},
-            {"chinese": "经理", "type": "Danh từ", "pinyin": "jīnglǐ", "meaning": "Giám đốc"},
-            {"chinese": "谁", "type": "Đại từ", "pinyin": "shéi / shuí", "meaning": "Ai"},
-            {"chinese": "哪儿 / 哪里", "type": "Đại từ nghi vấn", "pinyin": "Nǎr / Nǎlǐ", "meaning": "Đâu, chỗ nào"},
-            {"chinese": "睡觉", "type": "Động từ", "pinyin": "shuì jiào", "meaning": "Ngủ"}
+            {"chinese": "你", "type": "Đại từ", "pinyin": "nǐ", "meaning": "Bạn, anh, chị, cậu"}
         ];
 
         let fullVocabData = [];
@@ -440,7 +436,6 @@
             if (savedData) {
                 try { 
                     fullVocabData = JSON.parse(savedData);
-                    // Bắt buộc dữ liệu lưu phải chuẩn thuộc tính chinese
                     if(!fullVocabData || fullVocabData.length === 0 || !fullVocabData[0].chinese) {
                         fullVocabData = [...EMBEDDED_VOCAB_DATA];
                     }
@@ -481,7 +476,7 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // ĐỌC VÀ MAPPING EXCEL CHUẨN XÁC NGUYÊN BẢN CỘT
+        // ĐỌC THÔNG MINH CẠO SẠCH TIÊU ĐỀ KỂ CẢ SAI CHÍNH TẢ NHƯ CHENESE VÀ VOCABULARY
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -495,20 +490,18 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                    
-                    // Chuyển dạng mảng 2 chiều không lấy header mặc định để tự quản lý vị trí
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
                     if (!rows || rows.length < 2) {
-                        alert("File Excel không có dữ liệu hoặc sai cấu trúc!");
+                        alert("File Excel không có dữ liệu!");
                         return;
                     }
 
-                    // Tự nhận diện dòng Tiêu đề (Header)
+                    // Tìm dòng tiêu đề
                     let headerRowIndex = 0;
                     for (let i = 0; i < Math.min(rows.length, 5); i++) {
                         const rowStr = rows[i].join(" ").toUpperCase();
-                        if (rowStr.includes("HÁN") || rowStr.includes("CHINESE") || rowStr.includes("PINYIN") || rowStr.includes("VIỆT") || rowStr.includes("NGHĨA")) {
+                        if (rowStr.includes("CHENESE") || rowStr.includes("CHINESE") || rowStr.includes("PINYIN") || rowStr.includes("MEANING") || rowStr.includes("VOCABULARY")) {
                             headerRowIndex = i;
                             break;
                         }
@@ -519,17 +512,32 @@
                     let colChinese = -1, colType = -1, colPinyin = -1, colMeaning = -1;
 
                     headers.forEach((h, idx) => {
-                        if (h.includes('CHỮ HÁN') || h.includes('HÁN') || h.includes('CHINESE') || h.includes('KANJI') || h.includes('TỪ VỰNG')) colChinese = idx;
-                        else if (h.includes('LOẠI TỪ') || h.includes('LOẠI') || h.includes('TYPE') || h.includes('TỪ LOẠI')) colType = idx;
-                        else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM') || h.includes('PHÁT ÂM')) colPinyin = idx;
-                        else if (h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA') || h.includes('MEANING')) colMeaning = idx;
+                        // Tránh ăn nhầm vào các cột INPUT CHENESE
+                        if (h.includes('INPUT')) return;
+
+                        if ((h.includes('CHENESE') || h.includes('CHINESE') || h.includes('HÁN') || h.includes('KANJI')) && colChinese === -1) {
+                            colChinese = idx;
+                        }
+                        else if (h.includes('VOCABULARY') || h.includes('TYPE') || h.includes('LOẠI TỪ') || h.includes('TỪ LOẠI')) {
+                            colType = idx;
+                        }
+                        else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM')) {
+                            colPinyin = idx;
+                        }
+                        else if (h.includes('MEANING') || h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA')) {
+                            colMeaning = idx;
+                        }
                     });
 
-                    // Nếu không dò thấy tên cột thì mặc định gán chuẩn theo thứ tự Excel thông dụng: [0: Hán, 1: Loại từ, 2: Pinyin, 3: Tiếng Việt]
-                    if (colChinese === -1) colChinese = 0;
-                    if (colType === -1) colType = 1;
-                    if (colPinyin === -1) colPinyin = 2;
-                    if (colMeaning === -1) colMeaning = 3;
+                    // Nếu không nhận diện được tiêu đề, áp dụng chính xác vị trí theo ảnh Excel của bạn:
+                    // Cột 1 (Index 1): CHENESE -> Chữ Hán
+                    // Cột 2 (Index 2): VOCABULARY -> Loại từ
+                    // Cột 3 (Index 3): PINYIN -> Phiên âm
+                    // Cột 4 (Index 4): MEANING -> Nghĩa
+                    if (colChinese === -1) colChinese = 1;
+                    if (colType === -1) colType = 2;
+                    if (colPinyin === -1) colPinyin = 3;
+                    if (colMeaning === -1) colMeaning = 4;
 
                     const parsedData = [];
 
@@ -548,7 +556,7 @@
                     }
 
                     if (parsedData.length === 0) {
-                        alert("Không tìm thấy dữ liệu phù hợp trong file Excel!");
+                        alert("Không tìm thấy dữ liệu từ vựng trong file!");
                         return;
                     }
 
@@ -556,7 +564,7 @@
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
                     
                     if (statusText) { 
-                        statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`; 
+                        statusText.innerText = `✅ Đã nạp thành công ${fullVocabData.length} từ!`; 
                         statusText.style.color = "var(--success)"; 
                     }
                     
@@ -565,7 +573,7 @@
                     sequentialOffset = 0;
                     
                     startNewQuiz();
-                } catch (err) { alert("Lỗi đọc file Excel: " + err.message); }
+                } catch (err) { alert("Lỗi khi đọc file Excel: " + err.message); }
             };
             reader.readAsArrayBuffer(file);
         });
@@ -588,7 +596,7 @@
             const slicedData = fullVocabData.slice(fromIdx - 1, toIdx);
 
             if (slicedData.length === 0) {
-                alert("Khoảng câu bạn chọn không có dữ liệu hợp lệ!");
+                alert("Khoảng câu chọn không hợp lệ!");
                 return;
             }
 
@@ -628,8 +636,6 @@
                 
                 const isPinyinMode = (mode === 'pinyin_to_chinese');
                 
-                // Chế độ gõ Pinyin/Tiếng Trung -> Giấu Hán & Pinyin, Hiện Việt
-                // Chế độ gõ Tiếng Việt -> Hiện Hán & Pinyin, Giấu Việt
                 const displayChinese = isPinyinMode ? '***' : (item.chinese || '---');
                 const displayPinyin  = isPinyinMode ? '***' : (item.pinyin || '---');
                 const displayMeaning = isPinyinMode ? (item.meaning || '---') : '***';
@@ -716,7 +722,6 @@
                 rowTr.className = 'row-wrong'; 
             }
 
-            // Hiện lại đáp án khi hoàn tất câu
             document.getElementById(`chinese_${index}`).innerText = item.chinese;
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
             document.getElementById(`meaning_${index}`).innerText = item.meaning;
@@ -759,7 +764,7 @@
             document.getElementById('rangeTo').value = fullVocabData.length;
             sequentialOffset = 0;
             startNewQuiz();
-            alert("Đã xóa bộ nhớ đệm và khôi phục về mặc định thành công!");
+            alert("Đã xóa bộ nhớ đệm thành công!");
         });
     </script>
 </body>
