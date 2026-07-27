@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK Pro - TRẦN ANH TUẤN</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@500;700;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
@@ -223,14 +223,16 @@
 
         td { border-bottom: 1px solid rgba(203, 213, 225, 0.6); padding: 12px 6px; text-align: center; word-wrap: break-word; }
 
+        /* FONT HIỆN ĐẠI CHUẨN NOTO SANS SC */
         td.col-hanzi { 
-            font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
-            font-size: 22px; 
+            font-family: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            font-size: 28px; 
             font-weight: 700 !important;
-            color: #be185d;
+            color: #9f1239;
+            letter-spacing: 1px;
         }
 
-        td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; font-weight: 500; }
+        td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; font-weight: 600; }
         td.col-stt { color: #475569; font-weight: 600; }
         td.col-type { color: #0284c7; font-size: 12px; font-weight: 600; }
         td.col-viet { font-weight: 600; color: #1e293b; }
@@ -343,7 +345,6 @@
 <body>
 
     <script>
-        // Hiệu ứng hoa rơi & bông tuyết
         const symbols = ['🌸', '🌺', '🌷', '🌻', '🍃', '❄️', '❅', '✨', '💮', '❄️'];
         for (let i = 0; i < 45; i++) {
             const div = document.createElement('div');
@@ -378,8 +379,9 @@
             <div class="control-box">
                 <label class="box-label">🎯 Chế độ</label>
                 <select id="modeSelect">
-                    <option value="pinyin_to_chinese">Gõ Pinyin / Tiếng Trung</option>
-                    <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt</option>
+                    <option value="pinyin_show_chinese">Gõ Pinyin (Hiện sẵn Chữ Hán)</option>
+                    <option value="pinyin_to_chinese">Gõ Chữ Hán / Pinyin (Hiện Tiếng Việt)</option>
+                    <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt (Hiện sẵn Chữ Hán)</option>
                 </select>
             </div>
 
@@ -528,7 +530,6 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // ĐỌC FILE EXCEL VÀ XÁC MINH MÃ `CAMTU2019S2THANHAN2025` TẠI Ô Z1
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -543,7 +544,6 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-                    // KIỂM TRA MÃ KHÓA TẠI Ô Z1
                     const secretCell = worksheet['Z1'] ? worksheet['Z1'].v.toString().trim() : '';
                     const MY_SECRET_TOKEN = "CAMTU2019S2THANHAN2025"; 
 
@@ -694,11 +694,18 @@
                 const tr = document.createElement('tr');
                 tr.id = `row_${index}`;
                 
-                const isPinyinMode = (mode === 'pinyin_to_chinese');
-                
-                const displayChinese = isPinyinMode ? '***' : (item.chinese || '---');
-                const displayPinyin  = isPinyinMode ? '***' : '***'; 
-                const displayMeaning = isPinyinMode ? (item.meaning || '---') : '***';
+                let displayChinese = '***';
+                let displayPinyin  = '***';
+                let displayMeaning = '***';
+
+                if (mode === 'pinyin_show_chinese') {
+                    displayChinese = item.chinese || '---';
+                    displayMeaning = item.meaning || '---';
+                } else if (mode === 'chinese_to_meaning') {
+                    displayChinese = item.chinese || '---';
+                } else {
+                    displayMeaning = item.meaning || '---';
+                }
 
                 tr.innerHTML = `
                     <td class="col-stt">${index + 1}</td>
@@ -758,7 +765,10 @@
                            .filter(s => s.length > 0);
             };
 
-            if (mode === 'pinyin_to_chinese') {
+            if (mode === 'pinyin_show_chinese') {
+                const pinyinOptions = splitOptions(item.pinyin);
+                isCorrect = pinyinOptions.includes(inputVal);
+            } else if (mode === 'pinyin_to_chinese') {
                 const pinyinOptions = splitOptions(item.pinyin);
                 const chineseOptions = splitOptions(item.chinese);
 
@@ -807,7 +817,6 @@
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
 
-            // ĐÃ ĐỔI TÍNH CỘNG DỒN TỪ 0% TĂNG DẦN LÊN THEO TỔNG SỐ CÂU (total)
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
 
