@@ -4,24 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Luyện Từ Vựng HSK Pro - TRẦN ANH TUẤN</title>
+    <!-- Phông chữ chuẩn -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Serif+SC:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- THƯ VIỆN ĐỌC FILE EXCEL (SHEETJS) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <style>
         :root {
             --primary: #4f46e5;
             --primary-light: #e0e7ff;
-            --success: #059669;
-            --success-light: rgba(209, 250, 229, 0.85);
-            --danger: #dc2626;
-            --danger-light: rgba(254, 226, 226, 0.85);
+            --success: #10b981;
+            --success-light: #d1fae5;
+            --danger: #ef4444;
+            --danger-light: #fee2e2;
             --warning: #f59e0b;
-            --card-bg: rgba(255, 255, 255, 0.88);
+            --bg-body: #f4fbf7;
+            --card-bg: rgba(255, 255, 255, 0.93);
             --text-dark: #0f172a;
-            --text-muted: #475569;
+            --text-muted: #64748b;
             
-            --header-bg-start: rgba(238, 242, 255, 0.95);
-            --header-bg-end: rgba(224, 231, 255, 0.95);
+            /* ĐỔI TIÊU ĐỀ SANG XANH INDIGO (KHÔNG TRÙNG MÀU XANH LÁ ĐÁP ÁN) */
+            --header-bg-start: #eef2ff;
+            --header-bg-end: #e0e7ff;
             --header-text: #3730a3;
             --header-border: #c7d2fe;
         }
@@ -30,29 +35,30 @@
             font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             margin: 0; 
             padding: 20px;
+            background-color: var(--bg-body); 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(251, 207, 232, 0.2) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.12) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(254, 240, 138, 0.2) 0px, transparent 50%);
             color: var(--text-dark);
             font-size: 14px; 
             box-sizing: border-box;
             position: relative;
             min-height: 100vh;
             overflow-x: hidden;
-            background: linear-gradient(135deg, #fbcfe8 0%, #e0e7ff 50%, #bae6fd 100%);
         }
 
-        .falling-decor {
+        /* HỌA TIẾT HOA LÁ TRANG TRÍ GÓC */
+        .floral-bg-top {
             position: fixed;
-            top: -10vh;
-            z-index: 0;
-            user-select: none;
+            top: -25px;
+            left: -25px;
+            width: 240px;
+            height: 240px;
             pointer-events: none;
-            animation: fall linear infinite;
-            font-size: 24px;
-            opacity: 0.8;
-        }
-
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(360deg); opacity: 0.2; }
+            z-index: 0;
+            opacity: 0.75;
         }
 
         .container-wrapper {
@@ -72,41 +78,42 @@
         }
 
         .app-title {
-            font-size: 26px;
+            font-size: 24px;
             font-weight: 700;
-            color: #1e1b4b;
+            color: #312e81;
             display: flex;
             align-items: center;
             gap: 10px;
             margin: 0;
-            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8);
+            text-shadow: 0 1px 2px rgba(255,255,255,0.8);
         }
 
         .app-title .pro-tag {
-            background: linear-gradient(135deg, #ec4899, #8b5cf6);
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
             color: white;
             font-size: 11px;
-            padding: 4px 10px;
+            padding: 3px 8px;
             border-radius: 12px;
             vertical-align: middle;
-            box-shadow: 0 2px 5px rgba(236, 72, 153, 0.4);
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(99, 102, 241, 0.3);
         }
 
         .owner-badge {
-            background: rgba(255, 255, 255, 0.92);
-            border: 2px solid #f472b6;
-            padding: 6px 16px;
+            background: rgba(255, 255, 255, 0.85);
+            border: 1.5px solid #c7d2fe;
+            padding: 6px 14px;
             border-radius: 20px;
             display: flex;
             align-items: center;
             gap: 8px;
-            box-shadow: 0 4px 15px rgba(244, 114, 182, 0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
             backdrop-filter: blur(8px);
         }
 
         .owner-badge .owner-info { display: flex; flex-direction: column; line-height: 1.2; }
-        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #db2777; letter-spacing: 0.5px; }
-        .owner-badge .owner-class { font-size: 11px; color: #4f46e5; font-weight: 600; }
+        .owner-badge .owner-name { font-weight: 700; font-size: 13px; color: #3730a3; letter-spacing: 0.5px; }
+        .owner-badge .owner-class { font-size: 11px; color: #4338ca; font-weight: 500; }
 
         .controls { 
             display: flex; 
@@ -117,42 +124,29 @@
             backdrop-filter: blur(12px);
             padding: 14px 18px; 
             border-radius: 16px; 
-            box-shadow: 0 8px 25px -5px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px -5px rgba(0,0,0,0.04);
             margin-bottom: 20px;
-            border: 2px solid rgba(244, 114, 182, 0.4);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
+            position: relative;
         }
 
         .controls label {
-            font-weight: 600;
+            font-weight: 500;
             font-size: 13px;
-            color: #1e293b;
+            color: var(--text-muted);
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
         .controls select, .controls input[type="number"] {
-            padding: 7px 10px;
-            border: 1.5px solid #cbd5e1;
+            padding: 7px 12px;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             outline: none;
-            font-weight: 600;
+            font-weight: 500;
             background: #ffffff;
             transition: all 0.2s;
-        }
-
-        .range-group {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            background: rgba(240, 243, 250, 0.8);
-            padding: 4px 8px;
-            border-radius: 10px;
-            border: 1.5px dashed #cbd5e1;
-        }
-        .range-group input {
-            width: 50px;
-            text-align: center;
         }
 
         .btn { 
@@ -167,13 +161,13 @@
             align-items: center;
             gap: 6px;
             transition: all 0.2s ease;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-        .btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
 
         .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
-        .btn-purple { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+        .btn-purple { background: linear-gradient(135deg, #6366f1, #4f46e5); }
         .btn-orange { background: linear-gradient(135deg, #f59e0b, #d97706); }
         .btn-red { background: linear-gradient(135deg, #ef4444, #dc2626); }
         
@@ -186,12 +180,13 @@
         .table-container { 
             flex: 1; 
             background: var(--card-bg); 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border-radius: 16px; 
             padding: 16px; 
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
-            border: 2px solid rgba(244, 114, 182, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
             overflow-x: auto; 
+            position: relative;
         }
         
         table { 
@@ -204,20 +199,20 @@
         th { 
             background: linear-gradient(135deg, var(--header-bg-start), var(--header-bg-end)) !important;
             color: var(--header-text) !important;
-            font-weight: 700 !important;
+            font-weight: 600 !important;
             font-size: 13px !important;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             padding: 12px 8px !important;
-            border-top: 1.5px solid var(--header-border) !important;
-            border-bottom: 2px solid #f472b6 !important;
+            border-top: 1px solid var(--header-border) !important;
+            border-bottom: 2px solid #a5b4fc !important;
         }
 
-        th:first-child { border-left: 1.5px solid var(--header-border); border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
-        th:last-child { border-right: 1.5px solid var(--header-border); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
+        th:first-child { border-left: 1px solid var(--header-border); border-top-left-radius: 10px; border-bottom-left-radius: 10px; }
+        th:last-child { border-right: 1px solid var(--header-border); border-top-right-radius: 10px; border-bottom-right-radius: 10px; }
 
         td { 
-            border-bottom: 1px solid rgba(203, 213, 225, 0.6); 
+            border-bottom: 1px solid #f1f5f9; 
             padding: 12px 6px; 
             text-align: center; 
             word-wrap: break-word; 
@@ -225,16 +220,16 @@
 
         td.col-hanzi { 
             font-family: 'Kaiti', 'STKaiti', 'KaiTi_GB2312', 'Noto Serif SC', 'Microsoft YaHei', serif;
-            font-size: 22px; 
-            font-weight: 700 !important;
-            color: #be185d;
+            font-size: 21px; 
+            font-weight: 400 !important;
+            color: #0f172a;
         }
 
-        td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; font-weight: 500; }
-        td.col-stt { color: #475569; font-weight: 600; }
-        td.col-type { color: #0284c7; font-size: 12px; font-weight: 600; }
-        td.col-viet { font-weight: 600; color: #1e293b; }
-        td.col-status { font-weight: 700; }
+        td.col-pinyin { color: #475569; font-style: italic; font-size: 14px; }
+        td.col-stt { color: var(--text-muted); font-weight: 500; }
+        td.col-type { color: var(--text-muted); font-size: 12px; }
+        td.col-viet { font-weight: 500; color: #334155; }
+        td.col-status { font-weight: 600; }
 
         .col-stt { width: 6%; }
         .col-hanzi { width: 18%; }
@@ -251,54 +246,41 @@
             border-radius: 8px; 
             text-align: center; 
             font-size: 15px; 
-            font-weight: 500;
             outline: none;
-            background: rgba(255, 255, 255, 0.95);
+            background: #ffffff;
         }
 
         input[type="text"]:focus {
-            border-color: #ec4899;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
         
-        tr.row-correct td { background-color: var(--success-light) !important; color: #064e3b; }
-        tr.row-wrong td { background-color: var(--danger-light) !important; color: #7f1d1d; }
+        tr.row-correct td { background-color: var(--success-light) !important; color: #065f46; }
+        tr.row-wrong td { background-color: var(--danger-light) !important; color: #991b1b; }
 
         .stats-dashboard { 
             width: 250px; 
             background: var(--card-bg); 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(12px);
             border-radius: 16px; 
             padding: 18px; 
-            box-shadow: 0 10px 30px -5px rgba(0,0,0,0.1);
-            border: 2px solid rgba(244, 114, 182, 0.4);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.03);
+            border: 1.5px solid rgba(199, 210, 254, 0.6);
         }
 
-        .stats-dashboard h3 { font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; color: #db2777; font-weight: 700; }
+        .stats-dashboard h3 { font-size: 13px; margin: 0 0 12px 0; text-transform: uppercase; color: var(--text-muted); }
 
-        .timer-box {
-            background: linear-gradient(135deg, #e0e7ff, #fce7f3);
-            border: 1.5px solid #f472b6;
-            border-radius: 12px;
-            padding: 10px;
-            text-align: center;
-            margin-bottom: 14px;
-        }
-        .timer-box .timer-label { font-size: 11px; color: #4f46e5; font-weight: 700; text-transform: uppercase; }
-        .timer-box .timer-value { font-size: 20px; font-weight: 800; color: #db2777; margin-top: 2px; font-family: monospace; }
-
-        .progress-bar-bg { width: 100%; height: 8px; background-color: rgba(203, 213, 225, 0.6); border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
-        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #ec4899, #8b5cf6); transition: width 0.4s ease; }
+        .progress-bar-bg { width: 100%; height: 8px; background-color: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 16px; }
+        .progress-bar-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #10b981, #059669); transition: width 0.4s ease; }
 
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .stat-card { background: rgba(255, 255, 255, 0.85); padding: 10px; border-radius: 10px; border: 1.5px solid #fbcfe8; text-align: center; }
-        .stat-card .label { font-size: 11px; color: #475569; margin-bottom: 4px; font-weight: 600; }
+        .stat-card { background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #f1f5f9; text-align: center; }
+        .stat-card .label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
         .stat-card .value { font-size: 16px; font-weight: 700; }
 
-        .rate-card { margin-top: 12px; text-align: center; background: rgba(253, 242, 248, 0.9); padding: 12px; border-radius: 12px; border: 1.5px solid #f472b6; }
+        .rate-card { margin-top: 12px; text-align: center; background: linear-gradient(135deg, #ecfdf5, #f0fdf4); padding: 12px; border-radius: 12px; border: 1px solid #a7f3d0; }
 
-        .footer-owner { text-align: center; margin-top: 18px; padding-top: 12px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; font-weight: 500; }
+        .footer-owner { text-align: center; margin-top: 18px; padding-top: 12px; border-top: 1px dashed #e2e8f0; font-size: 11px; color: var(--text-muted); }
 
         @media (max-width: 768px) {
             body { padding: 10px; }
@@ -306,30 +288,23 @@
             .stats-dashboard { width: 100%; box-sizing: border-box; }
             .col-stt, .col-type, .col-status { display: none; }
             .col-hanzi { width: 28%; } .col-pinyin { width: 22%; } .col-viet { width: 26%; } .col-input { width: 24%; }
+            .floral-bg-top { display: none; }
         }
     </style>
 </head>
 <body>
 
-    <script>
-        const symbols = ['🌸', '🌺', '🌷', '🌻', '🍃', '🍀', '✨', '💮'];
-        for (let i = 0; i < 22; i++) {
-            const div = document.createElement('div');
-            div.className = 'falling-decor';
-            div.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
-            div.style.left = Math.random() * 100 + 'vw';
-            div.style.animationDuration = (Math.random() * 6 + 6) + 's';
-            div.style.animationDelay = (Math.random() * 5) + 's';
-            div.style.fontSize = (Math.random() * 12 + 18) + 'px';
-            document.body.appendChild(div);
-        }
-    </script>
+    <svg class="floral-bg-top" viewBox="0 0 250 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 120C10 80 50 20 110 40C140 10 200 30 190 80C230 100 210 180 160 170C140 220 70 200 50 160C10 150 0 130 20 120Z" fill="#a7f3d0"/>
+        <circle cx="100" cy="80" r="42" fill="#fef08a" opacity="0.6"/>
+        <circle cx="150" cy="115" r="48" fill="#fbcfe8" opacity="0.65"/>
+    </svg>
 
     <div class="container-wrapper">
         <div class="app-header">
-            <h2 class="app-title">🌸 Luyện Từ Vựng HSK <span class="pro-tag">PRO VIP</span> 🌺</h2>
+            <h2 class="app-title">🌿 Luyện Từ Vựng HSK <span class="pro-tag">PRO</span> 🌸</h2>
             <div class="owner-badge">
-                <span>👑</span>
+                <span>👤</span>
                 <div class="owner-info">
                     <span class="owner-name">TRẦN ANH TUẤN</span>
                     <span class="owner-class">C7 CB K139-140</span>
@@ -352,14 +327,6 @@
 
             <label>Số câu: 
                 <input type="number" id="quizSize" value="10" min="1" style="width: 45px; text-align: center;">
-            </label>
-
-            <label>Khoảng câu:
-                <div class="range-group">
-                    <input type="number" id="rangeFrom" placeholder="Từ" min="1" value="1">
-                    <span>đến</span>
-                    <input type="number" id="rangeTo" placeholder="Đến" min="1" value="100">
-                </div>
             </label>
 
             <button class="btn btn-purple" id="btnNewQuiz">🔀 Đổi đề</button>
@@ -387,22 +354,17 @@
             </div>
 
             <div class="stats-dashboard">
-                <div class="timer-box">
-                    <div class="timer-label">⏱ Thời gian làm bài</div>
-                    <div class="timer-value" id="timerDisplay">00:00</div>
-                </div>
-
                 <h3>📊 Tiến độ bài tập</h3>
                 <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressBar"></div></div>
                 <div class="stats-grid">
                     <div class="stat-card"><div class="label">Tổng số câu</div><div class="value" id="statTotal">0</div></div>
                     <div class="stat-card"><div class="label">Đã hoàn thành</div><div class="value" id="statDone">0</div></div>
-                    <div class="stat-card" style="border-color: #a7f3d0; background: rgba(240, 253, 244, 0.9);"><div class="label" style="color: #065f46;">Số câu Đúng</div><div class="value" style="color: var(--success);" id="statCorrect">0</div></div>
-                    <div class="stat-card" style="border-color: #fecaca; background: rgba(254, 242, 242, 0.9);"><div class="label" style="color: #991b1b;">Số câu Sai</div><div class="value" style="color: var(--danger);" id="statWrong">0</div></div>
+                    <div class="stat-card" style="border-color: var(--success-light); background: #f0fdf4;"><div class="label" style="color: #065f46;">Số câu Đúng</div><div class="value" style="color: var(--success);" id="statCorrect">0</div></div>
+                    <div class="stat-card" style="border-color: var(--danger-light); background: #fef2f2;"><div class="label" style="color: #991b1b;">Số câu Sai</div><div class="value" style="color: var(--danger);" id="statWrong">0</div></div>
                 </div>
                 <div class="rate-card">
-                    <div style="font-size: 11px; color: #be185d; font-weight: 700;">TỶ LỆ CHÍNH XÁC</div>
-                    <div style="font-size: 22px; font-weight: 700; color: #db2777; margin-top: 2px;" id="statRate">0.0%</div>
+                    <div style="font-size: 11px; color: #047857; font-weight: 500;">TỶ LỆ CHÍNH XÁC</div>
+                    <div style="font-size: 22px; font-weight: 700; color: #059669; margin-top: 2px;" id="statRate">0.0%</div>
                 </div>
                 <div class="footer-owner">Bản quyền thuộc sở hữu:<br><b>TRẦN ANH TUẤN - C7 CB K139-140</b></div>
             </div>
@@ -420,9 +382,6 @@
 
         let fullVocabData = [];
         let currentQuizData = [];
-        let timerInterval = null;
-        let secondsElapsed = 0;
-        let isTimerRunning = false;
 
         window.onload = function() {
             const savedData = localStorage.getItem('hsk_vocab_data');
@@ -432,39 +391,8 @@
             } else {
                 fullVocabData = [...EMBEDDED_VOCAB_DATA];
             }
-            // Thiết lập giá trị max ban đầu cho ô 'đến'
-            document.getElementById('rangeTo').value = fullVocabData.length;
             startNewQuiz();
         };
-
-        function resetTimer() {
-            clearInterval(timerInterval);
-            timerInterval = null;
-            secondsElapsed = 0;
-            isTimerRunning = false;
-            updateTimerDisplay();
-        }
-
-        function checkAndStartTimer() {
-            if (!isTimerRunning) {
-                isTimerRunning = true;
-                timerInterval = setInterval(() => {
-                    secondsElapsed++;
-                    updateTimerDisplay();
-                }, 1000);
-            }
-        }
-
-        function stopTimer() {
-            clearInterval(timerInterval);
-            isTimerRunning = false;
-        }
-
-        function updateTimerDisplay() {
-            const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
-            const secs = (secondsElapsed % 60).toString().padStart(2, '0');
-            document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
-        }
 
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -498,11 +426,6 @@
 
                     localStorage.setItem('hsk_vocab_data', JSON.stringify(fullVocabData));
                     if (statusText) { statusText.innerText = `✅ Đã nạp ${fullVocabData.length} từ!`; statusText.style.color = "var(--success)"; }
-                    
-                    // Cập nhật lại khoảng câu theo tổng số lượng từ mới đọc
-                    document.getElementById('rangeFrom').value = 1;
-                    document.getElementById('rangeTo').value = fullVocabData.length;
-                    
                     startNewQuiz();
                 } catch (err) { alert("Lỗi đọc file Excel: " + err.message); }
             };
@@ -511,42 +434,13 @@
 
         function startNewQuiz() {
             if (!fullVocabData || fullVocabData.length === 0) fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            
-            let fromIdx = parseInt(document.getElementById('rangeFrom').value) || 1;
-            let toIdx = parseInt(document.getElementById('rangeTo').value) || fullVocabData.length;
             const size = parseInt(document.getElementById('quizSize').value) || 10;
-
-            // Kiểm tra và giới hạn an toàn cho khoảng câu
-            if (fromIdx < 1) fromIdx = 1;
-            if (toIdx > fullVocabData.length) toIdx = fullVocabData.length;
-            if (fromIdx > toIdx) {
-                let temp = fromIdx; fromIdx = toIdx; toIdx = temp;
-            }
-
-            document.getElementById('rangeFrom').value = fromIdx;
-            document.getElementById('rangeTo').value = toIdx;
-
-            // Cắt mảng theo khoảng đã chọn (chuyển về index mảng JS bắt đầu từ 0)
-            const slicedData = fullVocabData.slice(fromIdx - 1, toIdx);
-
-            if (slicedData.length === 0) {
-                alert("Khoảng câu bạn chọn không có dữ liệu hợp lệ!");
-                return;
-            }
-
-            const shuffled = [...slicedData].sort(() => 0.5 - Math.random());
-            currentQuizData = shuffled.slice(0, Math.min(size, slicedData.length));
-            
-            resetTimer(); 
+            const shuffled = [...fullVocabData].sort(() => 0.5 - Math.random());
+            currentQuizData = shuffled.slice(0, Math.min(size, fullVocabData.length));
             renderTable();
         }
 
-        function retryCurrentQuiz() { 
-            if (currentQuizData.length > 0) {
-                resetTimer();
-                renderTable();
-            } 
-        }
+        function retryCurrentQuiz() { if (currentQuizData.length > 0) renderTable(); }
 
         function renderTable() {
             const tbody = document.getElementById('vocabTable');
@@ -567,8 +461,7 @@
                     <td class="col-input">
                         <input type="text" id="input_${index}" 
                                enterkeyhint="next" 
-                               oninput="checkAndStartTimer()"
-                               onblur="checkAnswer(${index})"
+                               oncompositionend="handleCompositionEnd(${index})"
                                onkeydown="handleKeyDown(event, ${index})">
                     </td>
                     <td id="status_${index}" class="col-status">-</td>
@@ -578,36 +471,42 @@
             updateStats();
         }
 
-        function handleKeyDown(event, index) {
-            checkAndStartTimer();
-            if (event.key === 'Enter' || event.keyCode === 13) {
-                event.preventDefault();
-                checkAnswer(index); 
-                
-                const nextInput = document.getElementById(`input_${index + 1}`);
-                if (nextInput) {
+        function handleCompositionEnd(index) { setTimeout(() => { moveToNext(index); }, 80); }
+
+        function moveToNext(index) {
+            checkAnswer(index);
+            const nextInput = document.getElementById(`input_${index + 1}`);
+            if (nextInput) {
+                setTimeout(() => {
                     nextInput.focus();
                     if (nextInput.select) nextInput.select();
-                }
+                }, 100);
             }
         }
 
-        function checkAnswer(index) {
-            const statusTd = document.getElementById(`status_${index}`);
-            if (statusTd && (statusTd.innerText.includes('Đúng') || statusTd.innerText.includes('Sai'))) {
-                return;
+        function handleKeyDown(event, index) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault();
+                moveToNext(index);
             }
+        }
 
+        // TÁCH DẤU PHÂN CÁCH VÀ SO SÁNH TỪNG ĐÁP ÁN
+        function checkAnswer(index) {
             const inputEl = document.getElementById(`input_${index}`);
             if (!inputEl) return;
             
             const inputVal = inputEl.value.trim().toLowerCase();
             const mode = document.getElementById('modeSelect').value;
             const item = currentQuizData[index];
+            const statusTd = document.getElementById(`status_${index}`);
             const rowTr = document.getElementById(`row_${index}`);
-            const isPinyinMode = (mode === 'pinyin_to_chinese');
 
             if (inputVal === '') {
+                statusTd.innerText = '-';
+                statusTd.className = 'col-status';
+                rowTr.className = '';
+                updateStats();
                 return;
             }
 
@@ -639,19 +538,16 @@
                 statusTd.innerText = '✓ Đúng';
                 statusTd.style.color = 'var(--success)';
                 rowTr.className = 'row-correct'; 
-                document.getElementById(`chinese_${index}`).innerText = item.chinese;
-                document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
-                document.getElementById(`meaning_${index}`).innerText = item.meaning;
             } else {
                 statusTd.innerText = '✗ Sai';
                 statusTd.style.color = 'var(--danger)';
                 rowTr.className = 'row-wrong'; 
-                document.getElementById(`chinese_${index}`).innerText = item.chinese;
-                document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
-                document.getElementById(`meaning_${index}`).innerText = item.meaning;
             }
 
-            inputEl.disabled = true;
+            document.getElementById(`chinese_${index}`).innerText = item.chinese;
+            document.getElementById(`pinyin_${index}`).innerText = item.pinyin;
+            document.getElementById(`meaning_${index}`).innerText = item.meaning;
+
             updateStats();
         }
 
@@ -675,20 +571,14 @@
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : 0;
             document.getElementById('statRate').innerText = `${rate}%`;
             document.getElementById('progressBar').style.width = `${total > 0 ? (done / total) * 100 : 0}%`;
-
-            if (done === total && total > 0) {
-                stopTimer();
-            }
         }
 
         document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
         document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
-        document.getElementById('modeSelect').addEventListener('change', startNewQuiz);
+        document.getElementById('modeSelect').addEventListener('change', renderTable);
         document.getElementById('btnReset').addEventListener('click', function() {
             localStorage.removeItem('hsk_vocab_data');
             fullVocabData = [...EMBEDDED_VOCAB_DATA];
-            document.getElementById('rangeFrom').value = 1;
-            document.getElementById('rangeTo').value = fullVocabData.length;
             startNewQuiz();
             alert("Đã khôi phục dữ liệu về mặc định!");
         });
