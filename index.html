@@ -461,7 +461,7 @@
 
         const EMBEDDED_VOCAB_DATA = [
             {"chinese": "早饭 / 早餐", "type": "Danh từ", "pinyin": "zǎofàn / zǎocān", "meaning": "Bữa sáng, điểm tâm"},
-            {"chinese": "午饭 / 晚餐", "type": "Danh từ", "pinyin": "wǔfàn / wǔcān", "meaning": "Bữa trưa"},
+            {"chinese": "因为……所以……", "type": "Liên từ", "pinyin": "yīnwèi……suǒyǐ……", "meaning": "Vì…… nên……"},
             {"chinese": "姐姐", "type": "Danh từ", "pinyin": "jiějie", "meaning": "Chị gái"}
         ];
 
@@ -773,22 +773,54 @@
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin || '---';
             document.getElementById(`meaning_${index}`).innerText = item.meaning || '---';
 
+            // Hàm làm sạch chuỗi: loại bỏ dấu ngoặc, dấu chấm ba chấm, khoảng trắng và ký tự đặc biệt
+            const cleanText = (str) => {
+                if (!str) return '';
+                return str
+                    .toLowerCase()
+                    .replace(/\(.*?\)/g, '')            // Xóa nội dung ngoặc (...)
+                    .replace(/（.*?）/g, '')            // Xóa nội dung ngoặc （...）
+                    .replace(/[…\.\,\;\:\-\_\s\t]/g, ''); // Xóa dấu chấm ba chấm, chấm, phẩy, khoảng trắng
+            };
+
             let isCorrect = false;
+            const userCleanInput = cleanText(rawInput);
 
             if (mode === 'pinyin_to_chinese') {
-                const chineseAnswers = (item.chinese || '').split(/[/,;＼｜]/).map(s => s.trim());
-                const pinyinAnswers = (item.pinyin || '').split(/[/,;＼｜]/).map(s => removePinyinTones(s.trim()));
-                const cleanInput = removePinyinTones(rawInput);
+                const chineseRaw = item.chinese || '';
+                const pinyinRaw = item.pinyin || '';
 
-                const matchChinese = chineseAnswers.some(ans => ans === rawInput);
-                const matchPinyin  = pinyinAnswers.some(ans => ans === cleanInput);
+                // PHÂN LOẠI: Cấu trúc đi đôi có chứa dấu chấm ba chấm (chữ Hán hoặc Pinyin)
+                const isPairChinese = /[…\.]/.test(chineseRaw);
+                const isPairPinyin  = /[…\.]/.test(pinyinRaw);
 
-                if (matchChinese || matchPinyin) {
-                    isCorrect = true;
+                // 1. Kiểm tra Chữ Hán
+                if (isPairChinese) {
+                    // Cấu trúc đi đôi (ví dụ: 因为……所以……): Phải gõ đủ cả 2 vế liền nhau
+                    if (cleanText(chineseRaw) === userCleanInput) isCorrect = true;
+                } else {
+                    // Từ ghép/đồng nghĩa phân tách bằng dấu / (ví dụ: 早饭 / 早餐): Gõ 1 trong các từ là Đúng
+                    const chineseAnswers = chineseRaw.split(/[/,;＼｜|]/).map(s => cleanText(s));
+                    if (chineseAnswers.some(ans => ans && ans === userCleanInput)) isCorrect = true;
+                }
+
+                // 2. Kiểm tra Pinyin (nếu gõ Pinyin thay vì chữ Hán)
+                if (!isCorrect) {
+                    const userPinyinClean = cleanText(removePinyinTones(rawInput));
+                    if (isPairPinyin) {
+                        if (cleanText(removePinyinTones(pinyinRaw)) === userPinyinClean) isCorrect = true;
+                    } else {
+                        const pinyinAnswers = pinyinRaw.split(/[/,;＼｜|]/).map(s => cleanText(removePinyinTones(s)));
+                        if (pinyinAnswers.some(ans => ans && ans === userPinyinClean)) isCorrect = true;
+                    }
                 }
             } else {
-                const meaningAnswers = (item.meaning || '').toLowerCase().split(/[/,;]/).map(s => s.trim());
-                isCorrect = meaningAnswers.some(ans => ans && (ans.includes(rawInput) || rawInput.includes(ans)));
+                // Kiểm tra Nghĩa Tiếng Việt
+                const meaningAnswers = (item.meaning || '').split(/[/,;＼｜|]/).map(s => cleanText(s));
+                isCorrect = meaningAnswers.some(ans => {
+                    if (!ans || !userCleanInput) return false;
+                    return ans === userCleanInput || ans.includes(userCleanInput) || userCleanInput.includes(ans);
+                });
             }
 
             if (isCorrect) {
