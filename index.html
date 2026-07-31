@@ -122,7 +122,7 @@
             margin: 0;
         }
 
-        .controls select, .controls input[type="number"] {
+        .controls select, .controls input[type="number"], .controls input[type="password"] {
             padding: 6px 10px;
             border: 1.5px solid #cbd5e1;
             border-radius: 9px;
@@ -134,7 +134,7 @@
             font-size: 13px;
         }
 
-        .controls select:focus, .controls input[type="number"]:focus {
+        .controls select:focus, .controls input:focus {
             border-color: #6366f1;
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
@@ -209,7 +209,7 @@
 
         td.col-hanzi { 
             font-family: 'Noto Sans SC', 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            font-size: 28px; 
+            font-size: 26px; 
             font-weight: 700 !important;
             color: #9f1239;
             letter-spacing: 1px;
@@ -222,10 +222,10 @@
         td.col-status { font-weight: 700; }
 
         .col-stt { width: 6%; }
-        .col-hanzi { width: 18%; }
+        .col-hanzi { width: 20%; }
         .col-type { width: 12%; }
         .col-pinyin { width: 16%; }
-        .col-viet { width: 23%; }
+        .col-viet { width: 21%; }
         .col-input { width: 17%; }
         .col-status { width: 8%; }
 
@@ -321,23 +321,20 @@
             .main-layout { flex-direction: column; }
             .table-container { padding: 6px; }
             .stats-dashboard { width: 100%; box-sizing: border-box; }
-            
             .col-status { display: none !important; }
-
             th { font-size: 11px !important; padding: 10px 2px !important; }
             td { padding: 10px 2px !important; font-size: 13px; }
-            td.col-hanzi { font-size: 22px; }
-            td.col-pinyin { font-size: 13px; }
+            td.col-hanzi { font-size: 20px; }
+            td.col-pinyin { font-size: 12px; }
             td.col-type { font-size: 11px; }
-            td.col-viet { font-size: 13px; }
-            input[type="text"] { font-size: 14px; padding: 6px 4px; width: 95%; }
-
+            td.col-viet { font-size: 12px; }
+            input[type="text"] { font-size: 13px; padding: 6px 2px; width: 95%; }
             .col-stt { width: 8%; }
-            .col-hanzi { width: 23%; }
-            .col-type { width: 14%; }
-            .col-pinyin { width: 19%; }
+            .col-hanzi { width: 25%; }
+            .col-type { width: 12%; }
+            .col-pinyin { width: 18%; }
             .col-viet { width: 22%; }
-            .col-input { width: 14%; }
+            .col-input { width: 15%; }
         }
     </style>
 </head>
@@ -345,7 +342,7 @@
 
     <script>
         const symbols = ['🌸', '🌺', '🌷', '🌻', '🍃', '❄️', '❅', '✨', '💮', '❄️'];
-        for (let i = 0; i < 45; i++) {
+        for (let i = 0; i < 40; i++) {
             const div = document.createElement('div');
             div.className = 'falling-decor';
             div.innerHTML = symbols[Math.floor(Math.random() * symbols.length)];
@@ -363,6 +360,12 @@
         </div>
 
         <div class="controls">
+            <!-- Ô NHẬP MÃ KÍCH HOẠT THIẾT BỊ -->
+            <div class="control-box" style="border: 2px solid #6366f1;">
+                <label class="box-label">🔑 Mã Kích Hoạt:</label>
+                <input type="password" id="userLicenseKey" placeholder="Nhập mã do Admin cấp..." style="width: 150px;">
+            </div>
+
             <label class="btn btn-excel">
                 📁 Chọn Excel
                 <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
@@ -459,9 +462,47 @@
     </div>
 
     <script>
+        // -------------------------------------------------------------------------
+        // 1. DANH SÁCH MÃ KÍCH HOẠT HỢP LỆ (Bạn có thể thêm/bớt mã tùy ý)
+        // -------------------------------------------------------------------------
+        const VALID_LICENSES = [
+            "TUAN-HSK-2026-HV01",
+            "TUAN-HSK-2026-HV02",
+            "TUAN-HSK-2026-HV03",
+            "ADMIN-SPECIAL-KEY"
+        ];
+
+        // -------------------------------------------------------------------------
+        // 2. HÀM TẠO VÂN TAY THIẾT BỊ (DEVICE FINGERPRINT)
+        // -------------------------------------------------------------------------
+        function getDeviceId() {
+            const info = [
+                navigator.userAgent,
+                navigator.language,
+                screen.colorDepth,
+                screen.width + 'x' + screen.height,
+                new Date().getTimezoneOffset(),
+                navigator.hardwareConcurrency || 4
+            ].join('||');
+
+            let hash = 0;
+            for (let i = 0; i < info.length; i++) {
+                const char = info.charCodeAt(i);
+                hash = (hash << 5) - hash + char;
+                hash |= 0;
+            }
+            return 'DEV-' + Math.abs(hash);
+        }
+
+        const CURRENT_DEVICE_ID = getDeviceId();
+
+        // -------------------------------------------------------------------------
+        // 3. DỮ LIỆU MẪU MẶC ĐỊNH
+        // -------------------------------------------------------------------------
         const EMBEDDED_VOCAB_DATA = [
-            {"chinese": "姐姐", "type": "Danh từ", "pinyin": "jiějie", "meaning": "Chị gái"},
-            {"chinese": "这", "type": "Đại từ", "pinyin": "zhè", "meaning": "Đây, này"}
+            {"chinese": "早饭 / 早餐", "type": "Danh từ", "pinyin": "zǎofàn / zǎocān", "meaning": "Bữa sáng, điểm tâm"},
+            {"chinese": "午饭 / 晚餐", "type": "Danh từ", "pinyin": "wǔfàn / wǔcān", "meaning": "Bữa trưa"},
+            {"chinese": "姐姐", "type": "Danh từ", "pinyin": "jiějie", "meaning": "Chị gái"}
         ];
 
         let fullVocabData = [];
@@ -530,12 +571,46 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
+        // -------------------------------------------------------------------------
+        // 4. XỬ LÝ ĐỌC FILE EXCEL & BẢO MẬT KHÓA THIẾT BỊ
+        // -------------------------------------------------------------------------
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
+            // Kiểm tra Mã kích hoạt
+            const inputKeyEl = document.getElementById('userLicenseKey');
+            const inputKey = inputKeyEl ? inputKeyEl.value.trim().toUpperCase() : '';
+
+            if (!inputKey) {
+                alert("⚠️ VUI LÒNG NHẬP MÃ KÍCH HOẠT!\n\nBạn cần nhập Mã Kích Hoạt do Admin cấp vào ô [🔑 Mã Kích Hoạt] trước khi tải file Excel.");
+                this.value = '';
+                return;
+            }
+
+            if (!VALID_LICENSES.includes(inputKey)) {
+                alert("❌ MÃ KÍCH HOẠT KHÔNG HỢP LỆ!\n\nMã kích hoạt bạn nhập không đúng hoặc không tồn tại trên hệ thống.");
+                this.value = '';
+                return;
+            }
+
+            // Kiểm tra ràng buộc thiết bị (Device Lock)
+            const storageKey = `device_lock_${inputKey}`;
+            const boundDevice = localStorage.getItem(storageKey);
+
+            if (!boundDevice) {
+                // Lần đầu kích hoạt -> Khóa chặt mã với thiết bị này
+                localStorage.setItem(storageKey, CURRENT_DEVICE_ID);
+                alert(`✅ KÍCH HOẠT THÀNH CÔNG!\nMã [${inputKey}] đã được gắn cố định với thiết bị này.`);
+            } else if (boundDevice !== CURRENT_DEVICE_ID) {
+                // Mã đã bị dùng trên thiết bị khác
+                alert(`🚫 TRUY CẬP BỊ TỪ CHỐI!\n\nMã kích hoạt [${inputKey}] ĐÃ ĐƯỢC SỬ DỤNG trên một thiết bị khác!\nMỗi mã chỉ được phép sử dụng trên 1 máy tính/điện thoại duy nhất.`);
+                this.value = '';
+                return;
+            }
+
             const statusText = document.getElementById('loadingStatus');
-            if (statusText) { statusText.innerText = "⏳ Đang xác minh bản quyền file..."; statusText.style.color = "var(--primary)"; }
+            if (statusText) { statusText.innerText = "⏳ Đang nạp bài tập..."; statusText.style.color = "var(--primary)"; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -543,18 +618,6 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-                    const secretCell = worksheet['Z1'] ? worksheet['Z1'].v.toString().trim() : '';
-                    const MY_SECRET_TOKEN = "CAMTU2019S2THANHAN2025"; 
-
-                    if (secretCell !== MY_SECRET_TOKEN) {
-                        alert("❌ KHÔNG THỂ MỞ FILE!\nFile Excel này không có Chữ Ký Bản Quyền hợp lệ.\n\nVui lòng liên hệ Admin để nhận file bài tập chuẩn!");
-                        if (statusText) {
-                            statusText.innerText = "❌ File không đúng bản quyền!";
-                            statusText.style.color = "var(--danger)";
-                        }
-                        return;
-                    }
 
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
@@ -566,7 +629,7 @@
                     let headerRowIndex = 0;
                     for (let i = 0; i < Math.min(rows.length, 5); i++) {
                         const rowStr = rows[i].join(" ").toUpperCase();
-                        if (rowStr.includes("CHENESE") || rowStr.includes("CHINESE") || rowStr.includes("PINYIN") || rowStr.includes("MEANING") || rowStr.includes("VOCABULARY")) {
+                        if (rowStr.includes("CHENESE") || rowStr.includes("CHINESE") || rowStr.includes("PINYIN") || rowStr.includes("MEANING")) {
                             headerRowIndex = i;
                             break;
                         }
@@ -577,10 +640,10 @@
 
                     headers.forEach((h, idx) => {
                         if (h.includes('INPUT')) return;
-                        if ((h.includes('CHENESE') || h.includes('CHINESE') || h.includes('HÁN') || h.includes('KANJI')) && colChinese === -1) colChinese = idx;
-                        else if (h.includes('VOCABULARY') || h.includes('TYPE') || h.includes('LOẠI TỪ') || h.includes('TỪ LOẠI')) colType = idx;
+                        if ((h.includes('CHENESE') || h.includes('CHINESE') || h.includes('HÁN')) && colChinese === -1) colChinese = idx;
+                        else if (h.includes('TYPE') || h.includes('LOẠI TỪ')) colType = idx;
                         else if (h.includes('PINYIN') || h.includes('PHIÊN ÂM')) colPinyin = idx;
-                        else if (h.includes('MEANING') || h.includes('TIẾNG VIỆT') || h.includes('VIỆT') || h.includes('NGHĨA')) colMeaning = idx;
+                        else if (h.includes('MEANING') || h.includes('TIẾNG VIỆT') || h.includes('NGHĨA')) colMeaning = idx;
                     });
 
                     if (colChinese === -1) colChinese = 1;
@@ -604,7 +667,7 @@
                     }
 
                     if (parsedData.length === 0) {
-                        alert("Không tìm thấy dữ liệu từ vựng trong file!");
+                        alert("Không tìm thấy dữ liệu từ vựng hợp lệ!");
                         return;
                     }
 
@@ -738,6 +801,9 @@
             }
         }
 
+        // -------------------------------------------------------------------------
+        // 5. XỬ LÝ KIỂM TRA ĐÁP ÁN (HỖ TRỢ ĐÁP ÁN KÉP CÁCH NHAU DẤU / HOẶC ,)
+        // -------------------------------------------------------------------------
         function checkAnswer(index) {
             const statusTd = document.getElementById(`status_${index}`);
             if (statusTd && (statusTd.innerText.includes('Đúng') || statusTd.innerText.includes('Sai'))) return;
@@ -759,17 +825,25 @@
             let isCorrect = false;
 
             if (mode === 'pinyin_to_chinese') {
-                const cleanPinyinTarget = removePinyinTones(item.pinyin);
-                const cleanInput = removePinyinTones(rawInput);
+                // Tách các đáp án Chữ Hán (nếu có dấu / hoặc ,)
+                const chineseAnswers = (item.chinese || '').split(/[/,;＼｜]/).map(s => s.trim());
                 
-                if (rawInput === item.chinese || cleanInput === cleanPinyinTarget) {
+                // Tách các đáp án Pinyin tương ứng
+                const pinyinAnswers = (item.pinyin || '').split(/[/,;＼｜]/).map(s => removePinyinTones(s.trim()));
+                
+                const cleanInput = removePinyinTones(rawInput);
+
+                // Khớp 1 trong các đáp án Chữ Hán hoặc Pinyin
+                const matchChinese = chineseAnswers.some(ans => ans === rawInput);
+                const matchPinyin  = pinyinAnswers.some(ans => ans === cleanInput);
+
+                if (matchChinese || matchPinyin) {
                     isCorrect = true;
                 }
             } else {
-                const targetMeaning = (item.meaning || '').toLowerCase();
-                if (targetMeaning.includes(rawInput) || rawInput.includes(targetMeaning)) {
-                    isCorrect = true;
-                }
+                // Kiểm tra Nghĩa Tiếng Việt
+                const meaningAnswers = (item.meaning || '').toLowerCase().split(/[/,;]/).map(s => s.trim());
+                isCorrect = meaningAnswers.some(ans => ans && (ans.includes(rawInput) || rawInput.includes(ans)));
             }
 
             if (isCorrect) {
