@@ -122,7 +122,7 @@
             margin: 0;
         }
 
-        .controls select, .controls input[type="number"], .controls input[type="password"] {
+        .controls select, .controls input[type="number"] {
             padding: 6px 10px;
             border: 1.5px solid #cbd5e1;
             border-radius: 9px;
@@ -360,12 +360,6 @@
         </div>
 
         <div class="controls">
-            <!-- Ô NHẬP MÃ KÍCH HOẠT THIẾT BỊ -->
-            <div class="control-box" style="border: 2px solid #6366f1;">
-                <label class="box-label">🔑 Mã Kích Hoạt:</label>
-                <input type="password" id="userLicenseKey" placeholder="Nhập mã do Admin cấp..." style="width: 150px;">
-            </div>
-
             <label class="btn btn-excel">
                 📁 Chọn Excel
                 <input type="file" id="excelFile" accept=".xlsx, .xls" style="display: none;">
@@ -462,43 +456,9 @@
     </div>
 
     <script>
-        // -------------------------------------------------------------------------
-        // 1. DANH SÁCH MÃ KÍCH HOẠT HỢP LỆ (Bạn có thể thêm/bớt mã tùy ý)
-        // -------------------------------------------------------------------------
-        const VALID_LICENSES = [
-            "TUAN-HSK-2026-HV01",
-            "TUAN-HSK-2026-HV02",
-            "TUAN-HSK-2026-HV03",
-            "ADMIN-SPECIAL-KEY"
-        ];
+        // MÃ KHÓA BẢO MẬT BÍ MẬT TẠI CỘT Z (Ô Z1)
+        const SECRET_KEY = "TUAN91_SECRET_2026";
 
-        // -------------------------------------------------------------------------
-        // 2. HÀM TẠO VÂN TAY THIẾT BỊ (DEVICE FINGERPRINT)
-        // -------------------------------------------------------------------------
-        function getDeviceId() {
-            const info = [
-                navigator.userAgent,
-                navigator.language,
-                screen.colorDepth,
-                screen.width + 'x' + screen.height,
-                new Date().getTimezoneOffset(),
-                navigator.hardwareConcurrency || 4
-            ].join('||');
-
-            let hash = 0;
-            for (let i = 0; i < info.length; i++) {
-                const char = info.charCodeAt(i);
-                hash = (hash << 5) - hash + char;
-                hash |= 0;
-            }
-            return 'DEV-' + Math.abs(hash);
-        }
-
-        const CURRENT_DEVICE_ID = getDeviceId();
-
-        // -------------------------------------------------------------------------
-        // 3. DỮ LIỆU MẪU MẶC ĐỊNH
-        // -------------------------------------------------------------------------
         const EMBEDDED_VOCAB_DATA = [
             {"chinese": "早饭 / 早餐", "type": "Danh từ", "pinyin": "zǎofàn / zǎocān", "meaning": "Bữa sáng, điểm tâm"},
             {"chinese": "午饭 / 晚餐", "type": "Danh từ", "pinyin": "wǔfàn / wǔcān", "meaning": "Bữa trưa"},
@@ -572,45 +532,14 @@
         }
 
         // -------------------------------------------------------------------------
-        // 4. XỬ LÝ ĐỌC FILE EXCEL & BẢO MẬT KHÓA THIẾT BỊ
+        // ĐỌC FILE EXCEL & KIỂM TRA MÃ KHÓA Ở CỘT Z (Ô Z1)
         // -------------------------------------------------------------------------
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            // Kiểm tra Mã kích hoạt
-            const inputKeyEl = document.getElementById('userLicenseKey');
-            const inputKey = inputKeyEl ? inputKeyEl.value.trim().toUpperCase() : '';
-
-            if (!inputKey) {
-                alert("⚠️ VUI LÒNG NHẬP MÃ KÍCH HOẠT!\n\nBạn cần nhập Mã Kích Hoạt do Admin cấp vào ô [🔑 Mã Kích Hoạt] trước khi tải file Excel.");
-                this.value = '';
-                return;
-            }
-
-            if (!VALID_LICENSES.includes(inputKey)) {
-                alert("❌ MÃ KÍCH HOẠT KHÔNG HỢP LỆ!\n\nMã kích hoạt bạn nhập không đúng hoặc không tồn tại trên hệ thống.");
-                this.value = '';
-                return;
-            }
-
-            // Kiểm tra ràng buộc thiết bị (Device Lock)
-            const storageKey = `device_lock_${inputKey}`;
-            const boundDevice = localStorage.getItem(storageKey);
-
-            if (!boundDevice) {
-                // Lần đầu kích hoạt -> Khóa chặt mã với thiết bị này
-                localStorage.setItem(storageKey, CURRENT_DEVICE_ID);
-                alert(`✅ KÍCH HOẠT THÀNH CÔNG!\nMã [${inputKey}] đã được gắn cố định với thiết bị này.`);
-            } else if (boundDevice !== CURRENT_DEVICE_ID) {
-                // Mã đã bị dùng trên thiết bị khác
-                alert(`🚫 TRUY CẬP BỊ TỪ CHỐI!\n\nMã kích hoạt [${inputKey}] ĐÃ ĐƯỢC SỬ DỤNG trên một thiết bị khác!\nMỗi mã chỉ được phép sử dụng trên 1 máy tính/điện thoại duy nhất.`);
-                this.value = '';
-                return;
-            }
-
             const statusText = document.getElementById('loadingStatus');
-            if (statusText) { statusText.innerText = "⏳ Đang nạp bài tập..."; statusText.style.color = "var(--primary)"; }
+            if (statusText) { statusText.innerText = "⏳ Đang kiểm tra mã khóa..."; statusText.style.color = "var(--primary)"; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -626,6 +555,18 @@
                         return;
                     }
 
+                    // 1. Kiểm tra mã khóa tại ô Z1 (dòng 1, cột 25 - chỉ số Z)
+                    // Hoặc tìm ở cột cuối cùng của hàng đầu tiên
+                    const secretInZ1 = rows[0] && rows[0][25] ? rows[0][25].toString().trim() : '';
+
+                    if (secretInZ1 !== SECRET_KEY) {
+                        alert("❌ TRUY CẬP BỊ TỪ CHỐI!\n\nFile Excel này KHÔNG HỢP LỆ hoặc đã bị chỉnh sửa làm mất mã xác thực cột Z.");
+                        document.getElementById('excelFile').value = '';
+                        if (statusText) statusText.innerText = "";
+                        return;
+                    }
+
+                    // 2. Tìm dòng tiêu đề
                     let headerRowIndex = 0;
                     for (let i = 0; i < Math.min(rows.length, 5); i++) {
                         const rowStr = rows[i].join(" ").toUpperCase();
@@ -802,7 +743,7 @@
         }
 
         // -------------------------------------------------------------------------
-        // 5. XỬ LÝ KIỂM TRA ĐÁP ÁN (HỖ TRỢ ĐÁP ÁN KÉP CÁCH NHAU DẤU / HOẶC ,)
+        // KIỂM TRA ĐÁP ÁN KÉP (NHẬP 1 TRONG 2 LÀ ĐÚNG)
         // -------------------------------------------------------------------------
         function checkAnswer(index) {
             const statusTd = document.getElementById(`status_${index}`);
@@ -825,15 +766,10 @@
             let isCorrect = false;
 
             if (mode === 'pinyin_to_chinese') {
-                // Tách các đáp án Chữ Hán (nếu có dấu / hoặc ,)
                 const chineseAnswers = (item.chinese || '').split(/[/,;＼｜]/).map(s => s.trim());
-                
-                // Tách các đáp án Pinyin tương ứng
                 const pinyinAnswers = (item.pinyin || '').split(/[/,;＼｜]/).map(s => removePinyinTones(s.trim()));
-                
                 const cleanInput = removePinyinTones(rawInput);
 
-                // Khớp 1 trong các đáp án Chữ Hán hoặc Pinyin
                 const matchChinese = chineseAnswers.some(ans => ans === rawInput);
                 const matchPinyin  = pinyinAnswers.some(ans => ans === cleanInput);
 
@@ -841,7 +777,6 @@
                     isCorrect = true;
                 }
             } else {
-                // Kiểm tra Nghĩa Tiếng Việt
                 const meaningAnswers = (item.meaning || '').toLowerCase().split(/[/,;]/).map(s => s.trim());
                 isCorrect = meaningAnswers.some(ans => ans && (ans.includes(rawInput) || rawInput.includes(ans)));
             }
