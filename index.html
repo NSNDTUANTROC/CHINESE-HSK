@@ -456,12 +456,11 @@
     </div>
 
     <script>
-        // MÃ KHÓA BẢO MẬT CHÍNH XÁC Ở Ô Z1 CỦA BẠN
         const SECRET_KEY = "CAMTU2019S2THANHAN2025";
 
         const EMBEDDED_VOCAB_DATA = [
             {"chinese": "早饭 / 早餐", "type": "Danh từ", "pinyin": "zǎofàn / zǎocān", "meaning": "Bữa sáng, điểm tâm"},
-            {"chinese": "因为……所以……", "type": "Liên từ", "pinyin": "yīnwèi……suǒyǐ……", "meaning": "Vì…… nên……"},
+            {"chinese": "เพราะ……所以……", "type": "Liên từ", "pinyin": "yīnwèi……suǒyǐ……", "meaning": "Vì…… nên……"},
             {"chinese": "姐姐", "type": "Danh từ", "pinyin": "jiějie", "meaning": "Chị gái"}
         ];
 
@@ -531,9 +530,6 @@
             document.getElementById('timerDisplay').innerText = `${mins}:${secs}`;
         }
 
-        // -------------------------------------------------------------------------
-        // ĐỌC FILE EXCEL & KIỂM TRA MÃ KHÓA Ở CỘT Z (Ô Z1)
-        // -------------------------------------------------------------------------
         document.getElementById('excelFile').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -548,10 +544,8 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
 
-                    // 1. Lấy giá trị trực tiếp từ ô Z1
                     const cellZ1 = worksheet['Z1'] ? worksheet['Z1'].v.toString().trim() : '';
 
-                    // 2. Chuyển thành mảng rows
                     const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
 
                     if (!rows || rows.length < 2) {
@@ -559,7 +553,6 @@
                         return;
                     }
 
-                    // Kiểm tra xem ô Z1 hoặc dòng 1 có chứa đúng mã khóa hay không
                     let hasValidKey = false;
                     if (cellZ1 === SECRET_KEY) {
                         hasValidKey = true;
@@ -579,7 +572,6 @@
                         return;
                     }
 
-                    // 3. Tìm dòng tiêu đề
                     let headerRowIndex = 0;
                     for (let i = 0; i < Math.min(rows.length, 5); i++) {
                         const rowStr = rows[i].join(" ").toUpperCase();
@@ -750,90 +742,58 @@
                 const nextInput = document.getElementById(`input_${index + 1}`);
                 if (nextInput) {
                     nextInput.focus();
-                    if (nextInput.select) nextInput.select();
+                } else {
+                    document.getElementById(`input_${index}`).blur();
                 }
             }
         }
 
         function checkAnswer(index) {
-            const statusTd = document.getElementById(`status_${index}`);
-            if (statusTd && (statusTd.innerText.includes('Đúng') || statusTd.innerText.includes('Sai'))) return;
-
             const inputEl = document.getElementById(`input_${index}`);
             if (!inputEl) return;
-            
-            const rawInput = inputEl.value.trim().toLowerCase();
-            const mode = document.getElementById('modeSelect').value;
-            if (!rawInput) return;
+
+            const userVal = inputEl.value.trim();
+            if (!userVal) return;
 
             const item = currentQuizData[index];
+            const mode = document.getElementById('modeSelect').value;
             const row = document.getElementById(`row_${index}`);
+            const statusEl = document.getElementById(`status_${index}`);
             
             document.getElementById(`chinese_${index}`).innerText = item.chinese || '---';
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin || '---';
             document.getElementById(`meaning_${index}`).innerText = item.meaning || '---';
 
-            // Hàm làm sạch chuỗi: loại bỏ dấu ngoặc, dấu chấm ba chấm, khoảng trắng và ký tự đặc biệt
-            const cleanText = (str) => {
-                if (!str) return '';
-                return str
-                    .toLowerCase()
-                    .replace(/\(.*?\)/g, '')            // Xóa nội dung ngoặc (...)
-                    .replace(/（.*?）/g, '')            // Xóa nội dung ngoặc （...）
-                    .replace(/[…\.\,\;\:\-\_\s\t]/g, ''); // Xóa dấu chấm ba chấm, chấm, phẩy, khoảng trắng
-            };
-
             let isCorrect = false;
-            const userCleanInput = cleanText(rawInput);
 
-            if (mode === 'pinyin_to_chinese') {
-                const chineseRaw = item.chinese || '';
-                const pinyinRaw = item.pinyin || '';
+            if (mode === 'chinese_to_meaning') {
+                // Tách các từ đồng nghĩa từ đáp án theo các ký tự phân cách (, ; /)
+                const meanings = item.meaning
+                    .toLowerCase()
+                    .split(/[,;/，；]/)
+                    .map(m => m.trim())
+                    .filter(m => m.length > 0);
 
-                // PHÂN LOẠI: Cấu trúc đi đôi có chứa dấu chấm ba chấm (chữ Hán hoặc Pinyin)
-                const isPairChinese = /[…\.]/.test(chineseRaw);
-                const isPairPinyin  = /[…\.]/.test(pinyinRaw);
+                const userMeaning = userVal.toLowerCase();
 
-                // 1. Kiểm tra Chữ Hán
-                if (isPairChinese) {
-                    // Cấu trúc đi đôi (ví dụ: 因为……所以……): Phải gõ đủ cả 2 vế liền nhau
-                    if (cleanText(chineseRaw) === userCleanInput) isCorrect = true;
-                } else {
-                    // Từ ghép/đồng nghĩa phân tách bằng dấu / (ví dụ: 早饭 / 早餐): Gõ 1 trong các từ là Đúng
-                    const chineseAnswers = chineseRaw.split(/[/,;＼｜|]/).map(s => cleanText(s));
-                    if (chineseAnswers.some(ans => ans && ans === userCleanInput)) isCorrect = true;
-                }
-
-                // 2. Kiểm tra Pinyin (nếu gõ Pinyin thay vì chữ Hán)
-                if (!isCorrect) {
-                    const userPinyinClean = cleanText(removePinyinTones(rawInput));
-                    if (isPairPinyin) {
-                        if (cleanText(removePinyinTones(pinyinRaw)) === userPinyinClean) isCorrect = true;
-                    } else {
-                        const pinyinAnswers = pinyinRaw.split(/[/,;＼｜|]/).map(s => cleanText(removePinyinTones(s)));
-                        if (pinyinAnswers.some(ans => ans && ans === userPinyinClean)) isCorrect = true;
-                    }
-                }
+                // BẮT BUỘC MATCH CHÍNH XÁC NGHĨA (Loại bỏ lỗi gõ 1 chữ cũng đúng)
+                isCorrect = meanings.some(m => m === userMeaning);
             } else {
-                // Kiểm tra Nghĩa Tiếng Việt
-                const meaningAnswers = (item.meaning || '').split(/[/,;＼｜|]/).map(s => cleanText(s));
-                isCorrect = meaningAnswers.some(ans => {
-                    if (!ans || !userCleanInput) return false;
-                    return ans === userCleanInput || ans.includes(userCleanInput) || userCleanInput.includes(ans);
-                });
+                const rawPinyin = removePinyinTones(item.pinyin);
+                const rawUser = removePinyinTones(userVal);
+                
+                isCorrect = (userVal === item.chinese) || 
+                            (rawUser === rawPinyin && rawPinyin !== '');
             }
 
             if (isCorrect) {
                 row.className = 'row-correct';
-                statusTd.innerText = '✅ Đúng';
-                statusTd.style.color = 'var(--success)';
+                statusEl.innerText = '✅';
             } else {
                 row.className = 'row-wrong';
-                statusTd.innerText = '❌ Sai';
-                statusTd.style.color = 'var(--danger)';
+                statusEl.innerText = '❌';
             }
 
-            inputEl.disabled = true;
             updateStats();
         }
 
@@ -843,14 +803,13 @@
             let correct = 0;
             let wrong = 0;
 
-            currentQuizData.forEach((_, index) => {
-                const statusTd = document.getElementById(`status_${index}`);
-                if (statusTd) {
-                    const text = statusTd.innerText;
-                    if (text.includes('Đúng')) {
+            currentQuizData.forEach((_, idx) => {
+                const row = document.getElementById(`row_${idx}`);
+                if (row) {
+                    if (row.classList.contains('row-correct')) {
                         done++;
                         correct++;
-                    } else if (text.includes('Sai')) {
+                    } else if (row.classList.contains('row-wrong')) {
                         done++;
                         wrong++;
                     }
@@ -862,11 +821,11 @@
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
 
-            const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : '0.0';
+            const rate = done > 0 ? ((correct / total) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
 
-            const progressPercent = total > 0 ? (done / total) * 100 : 0;
-            document.getElementById('progressBar').style.width = `${progressPercent}%`;
+            const progress = total > 0 ? (done / total) * 100 : 0;
+            document.getElementById('progressBar').style.width = `${progress}%`;
 
             if (done === total && total > 0) {
                 stopTimer();
