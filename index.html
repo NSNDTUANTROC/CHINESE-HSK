@@ -368,8 +368,9 @@
             <div class="control-box">
                 <label class="box-label">🎯 Chế độ</label>
                 <select id="modeSelect">
-                    <option value="pinyin_to_chinese">Gõ Chữ Hán / Pinyin (Hiện Tiếng Việt)</option>
-                    <option value="chinese_to_meaning">Gõ Nghĩa Tiếng Việt (Hiện sẵn Chữ Hán)</option>
+                    <option value="chinese_only">1. Chỉ gõ Chữ Hán (Hiện Tiếng Việt)</option>
+                    <option value="pinyin_to_chinese">2. Gõ Chữ Hán HOẶC Pinyin (Hiện Tiếng Việt)</option>
+                    <option value="chinese_to_meaning">3. Gõ Tiếng Việt (Hiện Chữ Hán)</option>
                 </select>
             </div>
 
@@ -486,7 +487,6 @@
             return str.toLowerCase().trim().replace(/\s+/g, ' ');
         }
 
-        // Tách chuỗi theo các dấu phân cách thông dụng (/ , ; hoặc dấu cách xung quanh /)
         function splitVariants(str) {
             if (!str) return [];
             return str.split(/[/,;|\n]+/)
@@ -776,22 +776,27 @@
             
             let isCorrect = false;
 
-            if (mode === 'pinyin_to_chinese') {
-                // Tách các từ đơn từ chuỗi gốc
+            if (mode === 'chinese_only') {
+                // CHẾ ĐỘ 1: Bắt buộc chỉ gõ Chữ Hán
+                const chineseVariants = splitVariants(item.chinese);
+                if (chineseVariants.includes(userVal)) {
+                    isCorrect = true;
+                }
+            } else if (mode === 'pinyin_to_chinese') {
+                // CHẾ ĐỘ 2: Chấp nhận cả Chữ Hán HOẶC Pinyin
                 const chineseVariants = splitVariants(item.chinese);
                 const pinyinVariantsWithTones = splitVariants(item.pinyin);
                 const pinyinVariantsNoTones = pinyinVariantsWithTones.map(removePinyinTones);
 
                 const userNoTone = removePinyinTones(userVal);
 
-                // So sánh nếu người dùng nhập trùng bất kỳ biến thể nào
                 if (chineseVariants.includes(userVal) || 
                     pinyinVariantsWithTones.includes(userVal) || 
                     pinyinVariantsNoTones.includes(userNoTone)) {
                     isCorrect = true;
                 }
             } else {
-                // Chế độ Gõ Nghĩa Tiếng Việt
+                // CHẾ ĐỘ 3: Gõ Nghĩa Tiếng Việt
                 const meaningVariants = splitVariants(item.meaning);
                 const userValNoTones = removePinyinTones(userVal);
 
@@ -800,7 +805,7 @@
                 });
             }
 
-            // Hiển thị đáp án mở khóa đầy đủ
+            // Mở khóa các ô chi tiết
             document.getElementById(`chinese_${index}`).innerText = item.chinese || '---';
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin || '---';
             document.getElementById(`meaning_${index}`).innerText = item.meaning || '---';
