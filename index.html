@@ -814,13 +814,13 @@
                 if (statusElem) statusElem.innerText = '✗';
             }
 
-            // Khóa ô nhập sau khi trả lời
+            // Khóa ô nhập sau khi kiểm tra xong
             inputElem.disabled = true;
 
             updateStats();
         }
 
-        // TÍNH TỶ LỆ CHÍNH XÁC: Xuất phát từ 0.0% và tính tăng dần dựa trên các câu đã làm
+        // TÍNH TỶ LỆ CHÍNH XÁC DỰA TRÊN TỔNG SỐ CÂU (10 CÂU = 100%)
         function updateStats() {
             const total = currentQuizData.length;
             let done = 0, correct = 0, wrong = 0;
@@ -843,8 +843,8 @@
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
 
-            // Tính tỷ lệ % đúng trên tổng số câu ĐÃ HOÀN THÀNH (Bắt đầu từ 0.0%)
-            const rate = done > 0 ? ((correct / done) * 100).toFixed(1) : '0.0';
+            // Công thức: (Số câu đúng / Tổng số câu) * 100
+            const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
 
             const progress = total > 0 ? (done / total) * 100 : 0;
