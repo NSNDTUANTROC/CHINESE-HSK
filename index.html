@@ -246,6 +246,15 @@
             background: #ffffff;
             box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
         }
+
+        /* Style cho ô input khi đã bị khóa */
+        input[type="text"]:disabled {
+            background-color: rgba(241, 245, 249, 0.7);
+            color: #334155;
+            cursor: not-allowed;
+            border-color: #cbd5e1;
+            font-weight: 600;
+        }
         
         tr.row-correct td { background-color: var(--success-light) !important; color: #064e3b; }
         tr.row-wrong td { background-color: var(--danger-light) !important; color: #7f1d1d; }
@@ -751,6 +760,7 @@
                 event.preventDefault();
                 checkAnswer(index); 
                 
+                // Tự động chuyển con trỏ sang ô tiếp theo
                 const nextInput = document.getElementById(`input_${index + 1}`);
                 if (nextInput) {
                     nextInput.focus();
@@ -762,7 +772,7 @@
 
         function checkAnswer(index) {
             const inputElem = document.getElementById(`input_${index}`);
-            if (!inputElem) return;
+            if (!inputElem || inputElem.disabled) return;
             
             const userVal = cleanString(inputElem.value);
             const item = currentQuizData[index];
@@ -806,6 +816,9 @@
                 rowElem.className = 'row-wrong';
                 if (statusElem) statusElem.innerText = '✗';
             }
+
+            // THÊM: Khóa ô input ngay sau khi kiểm tra xong
+            inputElem.disabled = true;
 
             updateStats();
         }
