@@ -247,7 +247,6 @@
             box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.25);
         }
 
-        /* Style cho ô input khi đã bị khóa */
         input[type="text"]:disabled {
             background-color: rgba(241, 245, 249, 0.7);
             color: #334155;
@@ -760,7 +759,6 @@
                 event.preventDefault();
                 checkAnswer(index); 
                 
-                // Tự động chuyển con trỏ sang ô tiếp theo
                 const nextInput = document.getElementById(`input_${index + 1}`);
                 if (nextInput) {
                     nextInput.focus();
@@ -804,7 +802,6 @@
                             validPinyinNoTones.includes(userValNoTones);
             }
 
-            // Hiện kết quả đầy đủ lên dòng tương ứng
             document.getElementById(`chinese_${index}`).innerText = item.chinese || '---';
             document.getElementById(`pinyin_${index}`).innerText = item.pinyin || '---';
             document.getElementById(`meaning_${index}`).innerText = item.meaning || '---';
@@ -817,12 +814,13 @@
                 if (statusElem) statusElem.innerText = '✗';
             }
 
-            // THÊM: Khóa ô input ngay sau khi kiểm tra xong
+            // Khóa ô nhập sau khi trả lời
             inputElem.disabled = true;
 
             updateStats();
         }
 
+        // TÍNH TỶ LỆ CHÍNH XÁC: Xuất phát từ 0.0% và tính tăng dần dựa trên các câu đã làm
         function updateStats() {
             const total = currentQuizData.length;
             let done = 0, correct = 0, wrong = 0;
@@ -845,6 +843,7 @@
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
 
+            // Tính tỷ lệ % đúng trên tổng số câu ĐÃ HOÀN THÀNH (Bắt đầu từ 0.0%)
             const rate = done > 0 ? ((correct / done) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
 
