@@ -219,7 +219,7 @@
         td.col-stt { color: #475569; font-weight: 600; }
         td.col-type { color: #0284c7; font-size: 12px; font-weight: 600; }
         td.col-viet { font-weight: 600; color: #1e293b; }
-        td.col-status { font-weight: 700; }
+        td.col-status { font-weight: 700; font-size: 16px; }
 
         .col-stt { width: 6%; }
         .col-hanzi { width: 20%; }
@@ -290,39 +290,6 @@
         .stat-card .value { font-size: 16px; font-weight: 700; }
 
         .rate-card { margin-top: 12px; text-align: center; background: rgba(253, 242, 248, 0.9); padding: 12px; border-radius: 12px; border: 1.5px solid #f472b6; }
-        
-        .contact-card {
-            margin-top: 14px;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1.5px solid #cbd5e1;
-            border-radius: 12px;
-            padding: 10px 12px;
-            font-size: 11px;
-            color: #334155;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-        .contact-card .contact-title {
-            font-weight: 700;
-            color: #4338ca;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            text-transform: uppercase;
-            font-size: 10px;
-            letter-spacing: 0.3px;
-        }
-        .contact-card .contact-item {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 4px;
-            word-break: break-all;
-        }
-        .contact-card .contact-item a { color: #2563eb; text-decoration: none; font-weight: 600; }
-        .contact-card .contact-item a:hover { text-decoration: underline; }
-
-        .footer-owner { text-align: center; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #cbd5e1; font-size: 11px; color: #475569; font-weight: 500; }
 
         @media (max-width: 768px) {
             body { padding: 8px; }
@@ -445,20 +412,6 @@
                     <div style="font-size: 11px; color: #be185d; font-weight: 700;">TỶ LỆ CHÍNH XÁC</div>
                     <div style="font-size: 22px; font-weight: 700; color: #db2777; margin-top: 2px;" id="statRate">0.0%</div>
                 </div>
-
-                <div class="contact-card">
-                    <div class="contact-title">💬 Trung tâm Hỗ trợ & Góp ý</div>
-                    <div class="contact-item">
-                        <span>✉️</span>
-                        <span>Email: <a href="mailto:tuan91.at@gmail.com">tuan91.at@gmail.com</a></span>
-                    </div>
-                    <div class="contact-item">
-                        <span>📞</span>
-                        <span>Hotline: <a href="tel:0917241091">0917 241 091</a></span>
-                    </div>
-                </div>
-
-                <div class="footer-owner">Bản quyền thuộc sở hữu:<br><b>TRẦN ANH TUẤN - C7 CB K139-140</b></div>
             </div>
         </div>
     </div>
@@ -469,7 +422,7 @@
         const EMBEDDED_VOCAB_DATA = [
             {"chinese": "早饭 / 早餐", "type": "Danh từ", "pinyin": "zǎofàn / zǎocān", "meaning": "Bữa sáng, điểm tâm"},
             {"chinese": "午饭 / 晚餐", "type": "Danh từ", "pinyin": "wǔfàn / wǔcān", "meaning": "Bữa trưa"},
-            {"chinese": "เพราะ……所以……", "type": "Liên từ", "pinyin": "yīnwèi……suǒyǐ……", "meaning": "Vì…… nên……"},
+            {"chinese": "เพราะ……อย่างไรก็ตาม……", "type": "Liên từ", "pinyin": "yīnwèi……suǒyǐ……", "meaning": "Vì…… nên……"},
             {"chinese": "姐姐", "type": "Danh từ", "pinyin": "jiějie", "meaning": "Chị gái"}
         ];
 
@@ -518,6 +471,8 @@
             document.getElementById('btnNewQuiz').addEventListener('click', startNewQuiz);
             document.getElementById('btnRetryQuiz').addEventListener('click', retryCurrentQuiz);
             document.getElementById('btnReset').addEventListener('click', resetAllData);
+            document.getElementById('shuffleSelect').addEventListener('change', function() { sequentialOffset = 0; });
+            document.getElementById('modeSelect').addEventListener('change', function() { renderTable(); });
 
             startNewQuiz();
         };
@@ -644,11 +599,11 @@
                         statusText.innerText = `✅ Đã nạp thành công ${fullVocabData.length} từ!`; 
                         statusText.style.color = "var(--success)"; 
                     }
-                    
+
                     document.getElementById('rangeFrom').value = 1;
                     document.getElementById('rangeTo').value = fullVocabData.length;
                     sequentialOffset = 0;
-                    
+
                     startNewQuiz();
                 } catch (err) { alert("Lỗi khi đọc file Excel: " + err.message); }
             };
@@ -691,9 +646,6 @@
             resetTimer(); 
             renderTable();
         }
-
-        document.getElementById('shuffleSelect').addEventListener('change', function() { sequentialOffset = 0; });
-        document.getElementById('modeSelect').addEventListener('change', function() { renderTable(); });
 
         function retryCurrentQuiz() { 
             if (currentQuizData.length > 0) {
@@ -814,13 +766,10 @@
                 if (statusElem) statusElem.innerText = '✗';
             }
 
-            // Khóa ô nhập sau khi kiểm tra xong
             inputElem.disabled = true;
-
             updateStats();
         }
 
-        // TÍNH TỶ LỆ CHÍNH XÁC DỰA TRÊN TỔNG SỐ CÂU (10 CÂU = 100%)
         function updateStats() {
             const total = currentQuizData.length;
             let done = 0, correct = 0, wrong = 0;
@@ -843,7 +792,6 @@
             document.getElementById('statCorrect').innerText = correct;
             document.getElementById('statWrong').innerText = wrong;
 
-            // Công thức: (Số câu đúng / Tổng số câu) * 100
             const rate = total > 0 ? ((correct / total) * 100).toFixed(1) : '0.0';
             document.getElementById('statRate').innerText = `${rate}%`;
 
